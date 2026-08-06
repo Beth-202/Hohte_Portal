@@ -180,12 +180,12 @@
     "loadingError": "መረጃ ለመጫን አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
     "networkError": "የይነገጽ ስህተት። እባክዎ ግንኙነትዎን ያረጋግጡ።"
   },
-  "evaluations": {
+ "evaluations": {
   "title": "ግምገማዎች",
   "role": "ሚና",
+  "evaluating": "→ በመገምገም ላይ",
   "pending": "በመጠባበቅ ላይ",
   "evaluated": "ተገምግሟል",
-  "evaluating": "በመገምገም ላይ",
   "noSurveys": "ለመገምገም ምንም የለም",
   "noSurveysDesc": "በአሁኑ ጊዜ ምንም የሚገመገሙ ሰዎች የሉም።",
   "typeHere": "እዚህ ይጻፉ...",

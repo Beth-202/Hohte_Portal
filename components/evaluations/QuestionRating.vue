@@ -1,12 +1,11 @@
 <template>
   <div class="question-rating">
     <div class="rating-stars">
-      <button
-        v-for="i in maxRating"
+      <button        v-for="i in maxRating"
         :key="i"
         type="button"
         class="star-btn"
-        @click="setRating(i)"
+        @click="$emit('update', i)"
       >
         <svg
           class="star-icon"
@@ -30,7 +29,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   value: {
     type: Number,
     default: null
@@ -41,11 +40,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update'])
-
-const setRating = (rating) => {
-  emit('update', rating)
-}
+defineEmits(['update'])
 </script>
 
 <style scoped>

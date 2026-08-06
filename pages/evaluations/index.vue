@@ -29,7 +29,7 @@
             <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
-        <h1 class="page-title">{{ t('evaluations.title') }}</h1>
+        <h1 class="page-title">{{ translate('evaluations.title') }}</h1>
         <div class="header-right"></div>
       </div>
     </header>
@@ -37,7 +37,7 @@
     <!-- Loading State -->
     <div v-if="isLoading" class="loading-state">
       <div class="spinner"></div>
-      <p>{{ t('common.loading') }}</p>
+      <p>{{ translate('common.loading') }}</p>
     </div>
 
     <!-- Content -->
@@ -45,8 +45,8 @@
       <!-- No Surveys -->
       <div v-if="surveys.length === 0" class="empty-state">
         <div class="empty-icon">📋</div>
-        <h3>{{ t('evaluations.noSurveys') }}</h3>
-        <p>{{ t('evaluations.noSurveysDesc') }}</p>
+        <h3>{{ translate('evaluations.noSurveys') }}</h3>
+        <p>{{ translate('evaluations.noSurveysDesc') }}</p>
       </div>
 
       <!-- Surveys List -->
@@ -58,7 +58,12 @@
         >
           <div class="survey-header">
             <h2 class="survey-title">{{ survey.title }}</h2>
-            <span class="survey-role">{{ t('evaluations.role') }}: {{ survey.evaluator_role }}</span>
+            <span class="survey-role">
+              {{ translate('evaluations.role') }}: 
+              <strong>{{ survey.evaluator_role }}</strong>
+              → {{ translate('evaluations.evaluating') }} 
+              <strong>{{ survey.subject_role }}</strong>
+            </span>
           </div>
 
           <div class="subjects-grid">
@@ -83,6 +88,7 @@
 
               <div class="subject-info">
                 <h4 class="subject-name">{{ subject.name }}</h4>
+                <span class="subject-class">{{ survey.class.name }}</span>
               </div>
 
               <button
@@ -91,7 +97,7 @@
                 @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
               >
                 <span class="status-dot" :class="subject.status"></span>
-                {{ subject.status === 'submitted' ? t('evaluations.evaluated') : t('evaluations.pending') }}
+                {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
               </button>
             </div>
           </div>
@@ -102,7 +108,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useLanguage } from '~/composables/useLanguage'
 import { useNavigation } from '~/composables/useNavigation'
 import { useSchool } from '~/composables/useSchool'
@@ -110,7 +116,7 @@ import { useToast } from '~/composables/useToast'
 import { useEvaluations } from '~/composables/useEvaluations'
 import ToastNotification from '~/components/ToastNotification.vue'
 
-const { t } = useLanguage()
+const { t: translate } = useLanguage()
 const { goBack, goToEvaluation } = useNavigation()
 const { getSchoolLogo, getSchoolName } = useSchool()
 const { toasts, removeToast } = useToast()
@@ -142,7 +148,7 @@ onMounted(async () => {
 .evaluations-container {
   min-height: 100vh;
   background: #1e3971;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding-bottom: 40px;
 }
 
@@ -282,6 +288,8 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -300,6 +308,10 @@ onMounted(async () => {
   background: rgba(255, 193, 37, 0.15);
   padding: 4px 12px;
   border-radius: 20px;
+}
+
+.survey-role strong {
+  color: white;
 }
 
 .subjects-grid {
@@ -366,6 +378,12 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
+.subject-class {
+  font-size: 11px;
+  color: #a0b3d9;
+  display: block;
+}
+
 .subject-status-btn {
   display: flex;
   align-items: center;
@@ -419,7 +437,6 @@ onMounted(async () => {
   .survey-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
   }
 
   .page-title {

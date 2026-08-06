@@ -1,3 +1,4 @@
+// composables/useEvaluations.js
 import { ref } from 'vue'
 import { apiService } from '~/services/api.service'
 import { useToast } from './useToast'
@@ -18,6 +19,7 @@ export const useEvaluations = () => {
       surveys.value = response || []
       return surveys.value
     } catch (err) {
+      console.error('Fetch surveys error:', err)
       error('Failed to load evaluations: ' + err.message, 4000)
       throw err
     } finally {
@@ -32,6 +34,7 @@ export const useEvaluations = () => {
       savedAnswers.value = response
       return response
     } catch (err) {
+      console.error('Fetch answers error:', err)
       error('Failed to load saved answers: ' + err.message, 4000)
       throw err
     } finally {
@@ -46,6 +49,7 @@ export const useEvaluations = () => {
       success('Evaluation saved successfully!', 3000)
       return response
     } catch (err) {
+      console.error('Save answers error:', err)
       error('Failed to save evaluation: ' + err.message, 4000)
       throw err
     } finally {
@@ -64,6 +68,21 @@ export const useEvaluations = () => {
     return subject ? subject.status : 'pending'
   }
 
+  const getSubjectById = (subjectId) => {
+    for (const survey of surveys.value) {
+      const subject = survey.subjects.find(s => s.id === subjectId)
+      if (subject) {
+        return {
+          subject,
+          survey,
+          classId: survey.class.id,
+          surveyId: survey.id
+        }
+      }
+    }
+    return null
+  }
+
   return {
     surveys,
     isLoading,
@@ -74,6 +93,7 @@ export const useEvaluations = () => {
     fetchAnswers,
     saveAnswers,
     getSurveyForSubject,
-    getSubjectStatus
+    getSubjectStatus,
+    getSubjectById
   }
 }

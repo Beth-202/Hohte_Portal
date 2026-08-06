@@ -4,7 +4,7 @@
       v-for="option in options"
       :key="option.id"
       class="choice-option"
-      @click="selectOption(option.id)"
+      @click="$emit('update', option.id)"
     >
       <div class="radio-circle" :class="{ selected: value === option.id }">
         <div v-if="value === option.id" class="radio-dot"></div>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   value: {
     type: Number,
     default: null
@@ -26,11 +26,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update'])
-
-const selectOption = (optionId) => {
-  emit('update', optionId)
-}
+defineEmits(['update'])
 </script>
 
 <style scoped>

@@ -19,13 +19,13 @@
           <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      <h1 class="form-title">{{ t('evaluations.evaluating') }}</h1>
+      <h1 class="form-title">{{ translate('evaluations.evaluating') }}</h1>
     </header>
 
     <!-- Loading -->
     <div v-if="isLoading" class="loading-state">
       <div class="spinner"></div>
-      <p>{{ t('common.loading') }}</p>
+      <p>{{ translate('common.loading') }}</p>
     </div>
 
     <!-- Form -->
@@ -47,9 +47,15 @@
         <div class="subject-details">
           <h2 class="subject-name">{{ subject.name }}</h2>
           <p class="subject-class">{{ survey.class.name }}</p>
+          <p class="subject-role-small">
+            {{ translate('evaluations.role') }}: 
+            <strong>{{ survey.evaluator_role }}</strong>
+            → {{ translate('evaluations.evaluating') }} 
+            <strong>{{ survey.subject_role }}</strong>
+          </p>
         </div>
         <span class="status-badge" :class="subject.status">
-          {{ subject.status === 'submitted' ? t('evaluations.evaluated') : t('evaluations.pending') }}
+          {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
         </span>
       </div>
 
@@ -67,64 +73,33 @@
 
           <!-- Rating -->
           <div v-if="question.type === 'rating'" class="rating-wrapper">
-            <div class="stars">
-              <button
-                v-for="i in question.max_rating"
-                :key="i"
-                type="button"
-                class="star-btn"
-                @click="setAnswer(question.id, 'rating', i)"
-              >
-                <svg
-                  class="star-icon"
-                  :class="{ filled: getAnswer(question.id) >= i }"
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <path
-                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <span class="rating-value">
-              {{ getAnswer(question.id) || 0 }} / {{ question.max_rating }}
-            </span>
+            <QuestionRating
+              :value="getAnswer(question.id)"
+              :max-rating="question.max_rating"
+              @update="(val) => setAnswer(question.id, 'rating', val)"
+            />
           </div>
 
           <!-- Single Choice -->
           <div v-else-if="question.type === 'single_choice'" class="choice-wrapper">
-            <div
-              v-for="option in question.options"
-              :key="option.id"
-              class="choice-option"
-              @click="setAnswer(question.id, 'option_id', option.id)"
-            >
-              <div class="radio-circle" :class="{ selected: getAnswer(question.id) === option.id }">
-                <div v-if="getAnswer(question.id) === option.id" class="radio-dot"></div>
-              </div>
-              <span class="choice-label">{{ option.label }}</span>
-            </div>
+            <QuestionChoice
+              :value="getAnswer(question.id)"
+              :options="question.options"
+              @update="(val) => setAnswer(question.id, 'option_id', val)"
+            />
           </div>
 
           <!-- Text -->
           <div v-else-if="question.type === 'text'" class="text-wrapper">
-            <textarea
+            <QuestionText
               :value="getTextAnswer(question.id)"
-              @input="setTextAnswer(question.id, $event.target.value)"
-              class="text-input"
-              :placeholder="t('evaluations.typeHere')"
-              rows="3"
-            ></textarea>
+              :placeholder="translate('evaluations.typeHere')"
+              @update="(val) => setTextAnswer(question.id, val)"
+            />
           </div>
 
           <div v-if="!isAnswerValid(question)" class="error-message">
-            {{ t('evaluations.requiredError') }}
+            {{ translate('evaluations.requiredError') }}
           </div>
         </div>
       </div>
@@ -132,10 +107,19 @@
       <!-- Submit -->
       <div class="submit-section">
         <button type="submit" class="submit-btn" :disabled="isSubmitting || !isFormValid">
-          {{ isSubmitting ? t('evaluations.submitting') : t('evaluations.submitEvaluation') }}
+          {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
         </button>
       </div>
     </form>
+
+    <!-- Error State -->
+    <div v-else-if="!isLoading && !survey" class="error-state-full">
+      <div class="error-icon">⚠️</div>
+      <h3>{{ translate('evaluations.subjectNotFound') }}</h3>
+      <button class="retry-button" @click="goToEvaluations">
+        {{ translate('common.back') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -147,11 +131,14 @@ import { useNavigation } from '~/composables/useNavigation'
 import { useToast } from '~/composables/useToast'
 import { useEvaluations } from '~/composables/useEvaluations'
 import ToastNotification from '~/components/ToastNotification.vue'
+import QuestionRating from '~/components/evaluations/QuestionRating.vue'
+import QuestionChoice from '~/components/evaluations/QuestionChoice.vue'
+import QuestionText from '~/components/evaluations/QuestionText.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useLanguage()
-const { goBack } = useNavigation()
+const { t: translate } = useLanguage()
+const { goBack, goToEvaluations } = useNavigation()
 const { toasts, removeToast, success, error } = useToast()
 const { surveys, fetchSurveys, fetchAnswers, saveAnswers, isLoading } = useEvaluations()
 
@@ -186,7 +173,6 @@ const setAnswer = (questionId, type, value) => {
   }
   answers.value[questionId].type = type
   answers.value[questionId].value = value
-  // Clear any previous text for non-text types
   if (type !== 'text') {
     answers.value[questionId].text = null
   }
@@ -238,7 +224,7 @@ const buildPayload = () => {
 
 const submitEvaluation = async () => {
   if (!isFormValid.value) {
-    error(t('evaluations.fillAllRequired'), 3000)
+    error(translate('evaluations.fillAllRequired'), 3000)
     return
   }
 
@@ -246,12 +232,13 @@ const submitEvaluation = async () => {
   try {
     const payload = buildPayload()
     await saveAnswers(surveyId.value, classId.value, subjectId, payload)
-    success(t('evaluations.saveSuccess'), 3000)
+    success(translate('evaluations.saveSuccess'), 3000)
     setTimeout(() => {
       router.push('/evaluations')
     }, 1500)
   } catch (err) {
-    error(t('evaluations.saveError'), 4000)
+    console.error('Submit error:', err)
+    error(translate('evaluations.saveError'), 4000)
   } finally {
     isSubmitting.value = false
   }
@@ -261,6 +248,7 @@ const loadData = async () => {
   await fetchSurveys()
   
   // Find the survey containing this subject
+  let found = false
   for (const s of surveys.value) {
     const subj = s.subjects.find(sub => sub.id === subjectId)
     if (subj) {
@@ -268,15 +256,13 @@ const loadData = async () => {
       classId.value = s.class.id
       survey.value = s
       subject.value = subj
+      found = true
       break
     }
   }
 
-  if (!survey.value || !subject.value) {
-    error(t('evaluations.subjectNotFound'), 4000)
-    setTimeout(() => {
-      router.push('/evaluations')
-    }, 2000)
+  if (!found) {
+    console.warn('Subject not found:', subjectId)
     return
   }
 
@@ -308,7 +294,7 @@ onMounted(loadData)
 .evaluation-form-container {
   min-height: 100vh;
   background: #1e3971;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 20px;
   padding-bottom: 40px;
 }
@@ -391,6 +377,7 @@ onMounted(loadData)
   border-radius: 16px;
   padding: 16px 20px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .subject-avatar {
@@ -419,6 +406,7 @@ onMounted(loadData)
 
 .subject-details {
   flex: 1;
+  min-width: 150px;
 }
 
 .subject-name {
@@ -429,9 +417,19 @@ onMounted(loadData)
 }
 
 .subject-class {
-  font-size: 14px;
+  font-size: 13px;
   color: #a0b3d9;
-  margin: 0;
+  margin: 2px 0 0;
+}
+
+.subject-role-small {
+  font-size: 12px;
+  color: #FFC125;
+  margin: 4px 0 0;
+}
+
+.subject-role-small strong {
+  color: white;
 }
 
 .status-badge {
@@ -481,120 +479,10 @@ onMounted(loadData)
   font-weight: 700;
 }
 
-/* Rating */
-.rating-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.stars {
-  display: flex;
-  gap: 4px;
-}
-
-.star-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  transition: transform 0.1s ease;
-}
-
-.star-btn:hover {
-  transform: scale(1.1);
-}
-
-.star-icon {
-  color: #555;
-  transition: color 0.2s ease;
-}
-
-.star-icon.filled {
-  color: #FFC125;
-  fill: #FFC125;
-}
-
-.rating-value {
-  color: #a0b3d9;
-  font-size: 14px;
-  min-width: 50px;
-}
-
-/* Single Choice */
-.choice-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.choice-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.choice-option:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.radio-circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s ease;
-  flex-shrink: 0;
-}
-
-.radio-circle.selected {
-  border-color: #FFC125;
-}
-
-.radio-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #FFC125;
-}
-
-.choice-label {
-  color: white;
-  font-size: 14px;
-}
-
-/* Text */
+.rating-wrapper,
+.choice-wrapper,
 .text-wrapper {
   width: 100%;
-}
-
-.text-input {
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s ease;
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: #FFC125;
-}
-
-.text-input::placeholder {
-  color: #666;
 }
 
 .error-message {
@@ -632,6 +520,34 @@ onMounted(loadData)
 .submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.error-state-full {
+  text-align: center;
+  padding: 60px 20px;
+  color: white;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.error-state-full h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+.retry-button {
+  background: #FFC125;
+  color: #1e3971;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 @media (max-width: 480px) {

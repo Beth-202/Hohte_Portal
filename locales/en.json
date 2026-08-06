@@ -180,12 +180,12 @@
     "loadingError": "Failed to load data. Please try again.",
     "networkError": "Network error. Please check your connection."
   },
-  "evaluations": {
+"evaluations": {
   "title": "Evaluations",
   "role": "Role",
+  "evaluating": "→ Evaluating",
   "pending": "Pending",
   "evaluated": "Evaluated",
-  "evaluating": "Evaluating",
   "noSurveys": "No evaluations to complete",
   "noSurveysDesc": "You don't have any pending evaluations at this time.",
   "typeHere": "Type here...",
@@ -197,5 +197,4 @@
   "saveError": "Failed to save evaluation. Please try again.",
   "subjectNotFound": "Subject not found. Please try again."
 }
-
 }

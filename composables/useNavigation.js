@@ -1,8 +1,10 @@
+// composables/useNavigation.js
 import { ref, watch } from "vue";
-import { useRoute } from "#app";
+import { useRoute, useRouter } from "#app";
 
 export const useNavigation = () => {
   const route = useRoute();
+  const router = useRouter();
 
   const activeNav = ref("home");
   const isLoading = ref(false);
@@ -19,6 +21,8 @@ export const useNavigation = () => {
       activeNav.value = "permission";
     } else if (path === "/permission/status") {
       activeNav.value = "status";
+    } else if (path === "/evaluations" || path.startsWith("/evaluations/")) {
+      activeNav.value = "evaluations";
     } else if (path === "/messages") {
       activeNav.value = "messages";
     } else if (path === "/alerts") {
@@ -41,8 +45,6 @@ export const useNavigation = () => {
     if (!path) return;
 
     isLoading.value = true;
-
-    const router = useRouter();
     router.push(path);
 
     setTimeout(() => {
@@ -51,7 +53,6 @@ export const useNavigation = () => {
   };
 
   const goBack = () => {
-    const router = useRouter();
     router.back();
   };
 
@@ -62,6 +63,13 @@ export const useNavigation = () => {
   const goToPermissionStatus = () => navigateTo("/permission/status");
   const goToMessages = () => navigateTo("/messages");
   const goToAlerts = () => navigateTo("/alerts");
+  
+  // ========== NEW: EVALUATION NAVIGATION ==========
+  const goToEvaluations = () => navigateTo("/evaluations");
+  const goToEvaluation = (surveyId, classId, subjectId) => {
+    // We only need the subjectId in the URL, the rest comes from the API response
+    navigateTo(`/evaluations/${subjectId}`);
+  };
 
   return {
     activeNav,
@@ -76,6 +84,8 @@ export const useNavigation = () => {
     goToPermissionStatus,
     goToMessages,
     goToAlerts,
+    goToEvaluations,
+    goToEvaluation,
     updateActiveNav,
   };
 };
