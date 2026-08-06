@@ -104,8 +104,9 @@
         </div>
       </div>
 
-      <!-- SUBMIT BUTTON - FIXED -->
+      <!-- ========== SUBMIT BUTTON WITH BREATHING ROOM ========== -->
       <div class="submit-section">
+        <div class="submit-spacer"></div>
         <button 
           type="submit" 
           class="submit-btn" 
@@ -113,6 +114,7 @@
         >
           {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
         </button>
+        <div class="submit-bottom-spacer"></div>
       </div>
     </form>
 
@@ -304,7 +306,7 @@ onMounted(loadData)
   background: #1e3971;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 160px; /* ← Extra breathing room at bottom */
 }
 
 .toast-container {
@@ -375,6 +377,7 @@ onMounted(loadData)
 .evaluation-form {
   max-width: 800px;
   margin: 0 auto;
+  padding-bottom: 40px;
 }
 
 .subject-info-bar {
@@ -499,17 +502,21 @@ onMounted(loadData)
   margin-top: 8px;
 }
 
-/* ========== SUBMIT BUTTON - FIXED ========== */
+/* ========== SUBMIT SECTION WITH BREATHING ROOM ========== */
 .submit-section {
-  margin-top: 30px;
+  margin-top: 50px;
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 0;
+}
+
+.submit-spacer {
+  height: 30px; /* ← Extra space above button */
 }
 
 .submit-btn {
   width: 100%;
   max-width: 400px;
-  padding: 18px 40px;
+  padding: 20px 40px;
   background: #FFC125;
   color: #1e3971;
   border: none;
@@ -521,6 +528,8 @@ onMounted(loadData)
   box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
   text-transform: uppercase;
   letter-spacing: 1px;
+  position: relative;
+  z-index: 10;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -537,6 +546,10 @@ onMounted(loadData)
 
 .submit-btn:active:not(:disabled) {
   transform: scale(0.98);
+}
+
+.submit-bottom-spacer {
+  height: 60px; /* ← Extra space below button */
 }
 
 .error-state-full {
@@ -567,9 +580,11 @@ onMounted(loadData)
   cursor: pointer;
 }
 
+/* ========== RESPONSIVE ========== */
 @media (max-width: 480px) {
   .evaluation-form-container {
     padding: 16px;
+    padding-bottom: 140px;
   }
 
   .subject-info-bar {
@@ -586,7 +601,20 @@ onMounted(loadData)
 
   .submit-btn {
     font-size: 16px;
-    padding: 16px 20px;
+    padding: 18px 20px;
+  }
+
+  .submit-section {
+    margin-top: 35px;
+    padding: 5px 0;
+  }
+
+  .submit-spacer {
+    height: 20px;
+  }
+
+  .submit-bottom-spacer {
+    height: 40px;
   }
 }
 </style>
