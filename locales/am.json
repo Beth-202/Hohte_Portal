@@ -201,6 +201,9 @@
     "youAre": "እርስዎ እንደ",
     "subjects": "ሰዎች",
     "noResults": "ምንም ውጤት አልተገኘም",
-    "noResultsDesc": "ከላይ ያለውን ማጣሪያ በመቀየር ተጨማሪ ግምገማዎችን ይመልከቱ።"
+    "noResultsDesc": "ከላይ ያለውን ማጣሪያ በመቀየር ተጨማሪ ግምገማዎችን ይመልከቱ።",
+    "editEvaluation": "ግምገማ ያርትዑ",
+    "updateEvaluation": "ግምገማ ያዘምኑ",
+    "updateSuccess": "ግምገማ በተሳካ ሁኔታ ተዘምኗል!"
   }
 }

@@ -104,16 +104,30 @@
         </div>
       </div>
 
-      <!-- ========== SUBMIT BUTTON WITH BREATHING ROOM ========== -->
+      <!-- ========== SUBMIT BUTTON WITH EDIT MODE & BREATHING ROOM ========== -->
       <div class="submit-section">
         <div class="submit-spacer"></div>
+        
+        <!-- If already submitted and not in edit mode → Show "Edit" button -->
         <button 
+          v-if="subject?.status === 'submitted' && !isEditing"
+          type="button"
+          class="submit-btn edit-mode"
+          @click="enableEdit"
+        >
+          {{ translate('evaluations.editEvaluation') }}
+        </button>
+        
+        <!-- Otherwise show Submit/Update button -->
+        <button 
+          v-else
           type="submit" 
           class="submit-btn" 
           :disabled="isSubmitting || !isFormValid"
         >
-          {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
+          {{ isSubmitting ? translate('evaluations.submitting') : (isEditing ? translate('evaluations.updateEvaluation') : translate('evaluations.submitEvaluation')) }}
         </button>
+        
         <div class="submit-bottom-spacer"></div>
       </div>
     </form>
@@ -155,6 +169,7 @@ const survey = ref(null)
 const subject = ref(null)
 const answers = ref({})
 const isSubmitting = ref(false)
+const isEditing = ref(false)
 
 const getInitials = (name) => {
   if (!name) return '?'
@@ -228,6 +243,10 @@ const buildPayload = () => {
   return payload
 }
 
+const enableEdit = () => {
+  isEditing.value = true
+}
+
 const submitEvaluation = async () => {
   if (!isFormValid.value) {
     error(translate('evaluations.fillAllRequired'), 3000)
@@ -238,10 +257,16 @@ const submitEvaluation = async () => {
   try {
     const payload = buildPayload()
     await saveAnswers(surveyId.value, classId.value, subjectId, payload)
-    success(translate('evaluations.saveSuccess'), 3000)
     
-    // Update local subject status to 'submitted' so the badge changes
+    if (isEditing.value) {
+      success(translate('evaluations.updateSuccess'), 3000)
+    } else {
+      success(translate('evaluations.saveSuccess'), 3000)
+    }
+    
+    // Update local subject status to 'submitted'
     subject.value.status = 'submitted'
+    isEditing.value = false
     
     setTimeout(() => {
       router.push('/evaluations')
@@ -306,7 +331,7 @@ onMounted(loadData)
   background: #1e3971;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding: 20px;
-  padding-bottom: 160px; /* ← Extra breathing room at bottom */
+  padding-bottom: 160px;
 }
 
 .toast-container {
@@ -510,7 +535,7 @@ onMounted(loadData)
 }
 
 .submit-spacer {
-  height: 30px; /* ← Extra space above button */
+  height: 30px;
 }
 
 .submit-btn {
@@ -548,8 +573,20 @@ onMounted(loadData)
   transform: scale(0.98);
 }
 
+/* Edit mode button */
+.submit-btn.edit-mode {
+  background: #4a6fc1;
+  color: white;
+  box-shadow: 0 4px 20px rgba(74, 111, 193, 0.3);
+}
+
+.submit-btn.edit-mode:hover:not(:disabled) {
+  background: #5a7fd1;
+  box-shadow: 0 8px 30px rgba(74, 111, 193, 0.4);
+}
+
 .submit-bottom-spacer {
-  height: 60px; /* ← Extra space below button */
+  height: 60px;
 }
 
 .error-state-full {

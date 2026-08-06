@@ -201,6 +201,9 @@
     "youAre": "You are",
     "subjects": "subjects",
     "noResults": "No results found",
-    "noResultsDesc": "Try changing the filter above to see more evaluations."
+    "noResultsDesc": "Try changing the filter above to see more evaluations.",
+    "editEvaluation": "Edit Evaluation",
+    "updateEvaluation": "Update Evaluation",
+    "updateSuccess": "Evaluation updated successfully!"
   }
 }

@@ -519,7 +519,7 @@ watch(courses, (newCourses) => {
 }
 
 .quick-action-section {
-  padding: 16px 20px 10px;
+  padding: 16px 20px 16px;
 }
 
 .quick-action-label {
@@ -1053,7 +1053,7 @@ watch(courses, (newCourses) => {
   }
 
   .quick-action-section {
-    padding: 12px 16px 8px;
+    padding: 12px 16px 16px;
   }
 }
 
@@ -1081,7 +1081,7 @@ watch(courses, (newCourses) => {
   }
 
   .quick-action-section {
-    padding: 10px 14px 8px;
+    padding: 10px 14px 16px;
   }
 }
 
