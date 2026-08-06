@@ -22,7 +22,10 @@
     "alerts": "ማሳወቂያዎች",
     "good": "ጥሩ",
     "average": "መካከለኛ",
-    "poor": "አልበለጠም"
+    "poor": "አልበለጠም",
+     "quickAction": "ፈጣን እርምጃ",
+  "evaluations": "የግምገማ ቅኝቶች",
+  "evaluationsSubtitle": "የቀሩትን ግምገማዎች ያጠናቅቁ"
   },
   "nav": {
     "home": "መነሻ",

@@ -22,7 +22,10 @@
     "alerts": "Alerts",
     "good": "Good",
     "average": "Average",
-    "poor": "Poor"
+    "poor": "Poor",
+    "quickAction": "Quick Action",
+  "evaluations": "Surveys & Evaluations",
+  "evaluationsSubtitle": "Complete your pending evaluations"
   },
   "nav": {
     "home": "Home",

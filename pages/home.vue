@@ -1,162 +1,3 @@
-<script setup>
-import { onMounted, ref, watch } from 'vue'
-import { useLanguage } from '~/composables/useLanguage'
-import { useNavigation } from '~/composables/useNavigation'
-import { useStudentData } from '~/composables/useStudentData'
-import { useSchool } from '~/composables/useSchool'
-
-import classImage from '~/assets/images/class_image.png'
-
-const { locale, t, setLocale } = useLanguage()
-const { goToPermissionStatus, goToCourseDetail } = useNavigation()
-const { student, courses, attendance, pendingRequestsCount, initializeData, isLoading, error } = useStudentData()
-const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool()
-
-const expandedSchedules = ref({})
-
-const toggleLanguage = () => {
-  const newLocale = locale.value === 'en' ? 'am' : 'en'
-  setLocale(newLocale) 
-}
-
-const toggleSchedule = (courseId, event) => {
-  event.stopPropagation() 
-  expandedSchedules.value[courseId] = !expandedSchedules.value[courseId]
-}
-
-const formatScheduleByDay = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') {
-    return []
-  }
-  
-  const scheduleItems = scheduleText.split(',').map(item => {
-    const trimmed = item.trim()
-    
-    let dayAbbr = ''
-    let time = ''
-    
-    if (trimmed.includes('Monday')) {
-      dayAbbr = 'Mon'
-      time = trimmed.replace('Monday', '').trim()
-    } else if (trimmed.includes('Tuesday')) {
-      dayAbbr = 'Tue'
-      time = trimmed.replace('Tuesday', '').trim()
-    } else if (trimmed.includes('Wednesday')) {
-      dayAbbr = 'Wed'
-      time = trimmed.replace('Wednesday', '').trim()
-    } else if (trimmed.includes('Thursday')) {
-      dayAbbr = 'Thu'
-      time = trimmed.replace('Thursday', '').trim()
-    } else if (trimmed.includes('Friday')) {
-      dayAbbr = 'Fri'
-      time = trimmed.replace('Friday', '').trim()
-    } else if (trimmed.includes('Saturday')) {
-      dayAbbr = 'Sat'
-      time = trimmed.replace('Saturday', '').trim()
-    } else if (trimmed.includes('Sunday')) {
-      dayAbbr = 'Sun'
-      time = trimmed.replace('Sunday', '').trim()
-    } else {
-      dayAbbr = trimmed.substring(0, 3)
-      time = trimmed.substring(3).trim()
-    }
-    
-    return { 
-      dayAbbr, 
-      time, 
-      full: trimmed,
-      dayFull: getFullDayName(trimmed)
-    }
-  })
-  
-  return scheduleItems
-}
-
-const getFullDayName = (scheduleText) => {
-  if (scheduleText.includes('Monday')) return 'Monday'
-  if (scheduleText.includes('Tuesday')) return 'Tuesday'
-  if (scheduleText.includes('Wednesday')) return 'Wednesday'
-  if (scheduleText.includes('Thursday')) return 'Thursday'
-  if (scheduleText.includes('Friday')) return 'Friday'
-  if (scheduleText.includes('Saturday')) return 'Saturday'
-  if (scheduleText.includes('Sunday')) return 'Sunday'
-  return scheduleText
-}
-
-const hasManySchedules = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return false
-  return scheduleText.split(',').length > 2
-}
-
-const getScheduleCount = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return 0
-  return scheduleText.split(',').length
-}
-
-const handleImageError = (event) => {
-  console.error('Image failed to load:', event.target.src);
-  
-  if (event.target.classList.contains('profile-image')) {
-    event.target.src = getPlaceholderProfile();
-    console.log('Falling back to placeholder for profile image');
-  } else if (event.target.classList.contains('course-bg')) {
-    event.target.src = classImage;
-    console.log('Retrying course background image with imported path');
-  } else if (event.target.classList.contains('logo-image')) {
-    // Fallback to default logo
-    event.target.src = '/assets/images/logo2-modified.png';
-    console.log('Falling back to default logo');
-  }
-}
-
-const getPlaceholderProfile = () => {
-  // Return a base64 encoded SVG as fallback
-  return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiMyQjRCODMiLz48cGF0aCBkPSJNNTAgNTVDNjAuMzU1MyA1NSA2OC44NzUgNDYuNDgwMiA2OC44NzUgMzYuMTI1QzY4Ljg3NSAyNS43Njk4IDYwLjM1NTMgMTcuMjUgNTAgMTcuMjVDMzkuNjQ0NyAxNy4yNSAzMS4xMjUgMjUuNzY5OCAzMS4xMjUgMzYuMTI1QzMxLjEyNSA0Ni40ODAyIDM5LjY0NDcgNTUgNTAgNTVaIiBmaWxsPSIjRkZGMDAwIi8+PHBhdGggZD0iTTUwIDYwQzMyLjg3NSA2MCAxOC43NSA3NC4xMjUgMTguNzUgOTEuMjVWOTJINzIuNVY5MS4yNUM3Mi41IDc0LjEyNSA1OC4zNzUgNjAgNTEuMjUgNjBINTAiIGZpbGw9IiNGRkYwMDAiLz48L3N2Zz4=';
-}
-
-const getClassImage = () => {
-  return classImage;
-}
-
-const getStudentProfileImage = () => {
-  if (student.value && student.value.profileImage) {
-    const profileUrl = student.value.profileImage;
-    if (profileUrl && (profileUrl.startsWith('http://') || profileUrl.startsWith('https://'))) {
-      console.log('Using ERP profile image:', profileUrl);
-      return profileUrl;
-    }
-  }
-  
-  if (student.value && student.value.raw && student.value.raw.photo_url) {
-    const photoUrl = student.value.raw.photo_url;
-    if (photoUrl && (photoUrl.startsWith('http://') || photoUrl.startsWith('https://'))) {
-      console.log('Using photo_url from API:', photoUrl);
-      return photoUrl;
-    }
-  }
-  
-  console.log('Using placeholder profile image');
-  return getPlaceholderProfile();
-}
-
-onMounted(async () => {
-  try {
-    console.log(' Home page mounted')
-    console.log('Initial student data:', student.value)
-    console.log('Initial courses:', courses.value)
-    await initializeData()
-    console.log('After initialize - student:', student.value)
-    console.log('After initialize - courses:', courses.value)
-  } catch (err) {
-    console.error('Failed to initialize data:', err)
-  }
-})
-
-watch(courses, (newCourses) => {
-  console.log('Courses updated:', newCourses.length)
-}, { immediate: true })
-</script>
-
 <template>
   <div class="dashboard-container">
     <div v-if="isLoading" class="loading-overlay">
@@ -198,6 +39,7 @@ watch(courses, (newCourses) => {
         </div>
       </header>
 
+      <!-- Alert Box: Pending Permission Requests -->
       <div class="alert-box" @click="goToPermissionStatus">
         <div class="alert-content">
           <span class="alert-icon">
@@ -215,6 +57,33 @@ watch(courses, (newCourses) => {
           </svg>
         </span>
       </div>
+
+      <!-- ========== NEW: EVALUATION QUICK ACTION ========== -->
+      <div class="quick-action-section">
+        <p class="quick-action-label">{{ t('home.quickAction') }}</p>
+        <div class="evaluation-card" @click="goToEvaluations">
+          <div class="evaluation-card-content">
+            <div class="evaluation-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" opacity="0.3"/>
+                <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
+                <path d="M11 12L13 14M13 12L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="evaluation-text">
+              <span class="evaluation-title">{{ t('home.evaluations') }}</span>
+              <span class="evaluation-subtitle">{{ t('home.evaluationsSubtitle') }}</span>
+            </div>
+          </div>
+          <span class="evaluation-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+      <!-- ========== END EVALUATION QUICK ACTION ========== -->
 
       <section class="courses-section">
         <h2 class="section-title">{{ t('home.myCourses') }}</h2>
@@ -346,6 +215,169 @@ watch(courses, (newCourses) => {
   </div>
 </template>
 
+<script setup>
+import { onMounted, ref, watch } from 'vue'
+import { useRouter } from '#app'
+import { useLanguage } from '~/composables/useLanguage'
+import { useNavigation } from '~/composables/useNavigation'
+import { useStudentData } from '~/composables/useStudentData'
+import { useSchool } from '~/composables/useSchool'
+
+import classImage from '~/assets/images/class_image.png'
+
+const router = useRouter()
+const { locale, t, setLocale } = useLanguage()
+const { goToPermissionStatus, goToCourseDetail } = useNavigation()
+const { student, courses, attendance, pendingRequestsCount, initializeData, isLoading, error } = useStudentData()
+const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool()
+
+const expandedSchedules = ref({})
+
+const toggleLanguage = () => {
+  const newLocale = locale.value === 'en' ? 'am' : 'en'
+  setLocale(newLocale) 
+}
+
+const toggleSchedule = (courseId, event) => {
+  event.stopPropagation() 
+  expandedSchedules.value[courseId] = !expandedSchedules.value[courseId]
+}
+
+const goToEvaluations = () => {
+  router.push('/evaluations')
+}
+
+const formatScheduleByDay = (scheduleText) => {
+  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') {
+    return []
+  }
+  
+  const scheduleItems = scheduleText.split(',').map(item => {
+    const trimmed = item.trim()
+    
+    let dayAbbr = ''
+    let time = ''
+    
+    if (trimmed.includes('Monday')) {
+      dayAbbr = 'Mon'
+      time = trimmed.replace('Monday', '').trim()
+    } else if (trimmed.includes('Tuesday')) {
+      dayAbbr = 'Tue'
+      time = trimmed.replace('Tuesday', '').trim()
+    } else if (trimmed.includes('Wednesday')) {
+      dayAbbr = 'Wed'
+      time = trimmed.replace('Wednesday', '').trim()
+    } else if (trimmed.includes('Thursday')) {
+      dayAbbr = 'Thu'
+      time = trimmed.replace('Thursday', '').trim()
+    } else if (trimmed.includes('Friday')) {
+      dayAbbr = 'Fri'
+      time = trimmed.replace('Friday', '').trim()
+    } else if (trimmed.includes('Saturday')) {
+      dayAbbr = 'Sat'
+      time = trimmed.replace('Saturday', '').trim()
+    } else if (trimmed.includes('Sunday')) {
+      dayAbbr = 'Sun'
+      time = trimmed.replace('Sunday', '').trim()
+    } else {
+      dayAbbr = trimmed.substring(0, 3)
+      time = trimmed.substring(3).trim()
+    }
+    
+    return { 
+      dayAbbr, 
+      time, 
+      full: trimmed,
+      dayFull: getFullDayName(trimmed)
+    }
+  })
+  
+  return scheduleItems
+}
+
+const getFullDayName = (scheduleText) => {
+  if (scheduleText.includes('Monday')) return 'Monday'
+  if (scheduleText.includes('Tuesday')) return 'Tuesday'
+  if (scheduleText.includes('Wednesday')) return 'Wednesday'
+  if (scheduleText.includes('Thursday')) return 'Thursday'
+  if (scheduleText.includes('Friday')) return 'Friday'
+  if (scheduleText.includes('Saturday')) return 'Saturday'
+  if (scheduleText.includes('Sunday')) return 'Sunday'
+  return scheduleText
+}
+
+const hasManySchedules = (scheduleText) => {
+  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return false
+  return scheduleText.split(',').length > 2
+}
+
+const getScheduleCount = (scheduleText) => {
+  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return 0
+  return scheduleText.split(',').length
+}
+
+const handleImageError = (event) => {
+  console.error('Image failed to load:', event.target.src);
+  
+  if (event.target.classList.contains('profile-image')) {
+    event.target.src = getPlaceholderProfile();
+    console.log('Falling back to placeholder for profile image');
+  } else if (event.target.classList.contains('course-bg')) {
+    event.target.src = classImage;
+    console.log('Retrying course background image with imported path');
+  } else if (event.target.classList.contains('logo-image')) {
+    event.target.src = '/assets/images/logo2-modified.png';
+    console.log('Falling back to default logo');
+  }
+}
+
+const getPlaceholderProfile = () => {
+  return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiMyQjRCODMiLz48cGF0aCBkPSJNNTAgNTVDNjAuMzU1MyA1NSA2OC44NzUgNDYuNDgwMiA2OC44NzUgMzYuMTI1QzY4Ljg3NSAyNS43Njk4IDYwLjM1NTMgMTcuMjUgNTAgMTcuMjVDMzkuNjQ0NyAxNy4yNSAzMS4xMjUgMjUuNzY5OCAzMS4xMjUgMzYuMTI1QzMxLjEyNSA0Ni40ODAyIDM5LjY0NDcgNTUgNTAgNTVaIiBmaWxsPSIjRkZGMDAwIi8+PHBhdGggZD0iTTUwIDYwQzMyLjg3NSA2MCAxOC43NSA3NC4xMjUgMTguNzUgOTEuMjVWOTJINzIuNVY5MS4yNUM3Mi41IDc0LjEyNSA1OC4zNzUgNjAgNTEuMjUgNjBINTBaIiBmaWxsPSIjRkZGMDAwIi8+PC9zdmc+';
+}
+
+const getClassImage = () => {
+  return classImage;
+}
+
+const getStudentProfileImage = () => {
+  if (student.value && student.value.profileImage) {
+    const profileUrl = student.value.profileImage;
+    if (profileUrl && (profileUrl.startsWith('http://') || profileUrl.startsWith('https://'))) {
+      console.log('Using ERP profile image:', profileUrl);
+      return profileUrl;
+    }
+  }
+  
+  if (student.value && student.value.raw && student.value.raw.photo_url) {
+    const photoUrl = student.value.raw.photo_url;
+    if (photoUrl && (photoUrl.startsWith('http://') || photoUrl.startsWith('https://'))) {
+      console.log('Using photo_url from API:', photoUrl);
+      return photoUrl;
+    }
+  }
+  
+  console.log('Using placeholder profile image');
+  return getPlaceholderProfile();
+}
+
+onMounted(async () => {
+  try {
+    console.log(' Home page mounted')
+    console.log('Initial student data:', student.value)
+    console.log('Initial courses:', courses.value)
+    await initializeData()
+    console.log('After initialize - student:', student.value)
+    console.log('After initialize - courses:', courses.value)
+  } catch (err) {
+    console.error('Failed to initialize data:', err)
+  }
+})
+
+watch(courses, (newCourses) => {
+  console.log('Courses updated:', newCourses.length)
+}, { immediate: true })
+</script>
+
 <style scoped>
 .dashboard-container {
   min-height: 100vh;
@@ -446,12 +478,13 @@ watch(courses, (newCourses) => {
   background: #2b4b8f;
 }
 
+/* ========== EXISTING ALERT BOX ========== */
 .alert-box {
   background: rgba(255, 255, 255, 0.1);
   color: #ffc125;
   border-radius: 16px;
   padding: 14px 20px;
-  margin: 10px 20px 25px;
+  margin: 10px 20px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -485,6 +518,123 @@ watch(courses, (newCourses) => {
   stroke: #ffc125;
 }
 
+/* ========== NEW: QUICK ACTION SECTION ========== */
+.quick-action-section {
+  padding: 8px 20px 0;
+}
+
+.quick-action-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a0b3d9;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.evaluation-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #FFC125 0%, #f5a623 100%);
+  border-radius: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glow effect */
+.evaluation-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  animation: glowPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.evaluation-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 30px rgba(255, 193, 37, 0.4);
+}
+
+.evaluation-card:active {
+  transform: scale(0.98);
+}
+
+.evaluation-card-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.evaluation-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e3971;
+  flex-shrink: 0;
+  backdrop-filter: blur(5px);
+}
+
+.evaluation-icon svg {
+  color: #1e3971;
+}
+
+.evaluation-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.evaluation-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e3971;
+}
+
+.evaluation-subtitle {
+  font-size: 13px;
+  color: rgba(30, 57, 113, 0.7);
+  font-weight: 500;
+}
+
+.evaluation-arrow {
+  color: #1e3971;
+  opacity: 0.6;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.evaluation-card:hover .evaluation-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* ========== REST OF YOUR EXISTING STYLES ========== */
 .section-title {
   font-size: 24px;
   font-weight: 800;
@@ -883,6 +1033,24 @@ watch(courses, (newCourses) => {
     font-size: 12px;
     padding: 5px 6px;
   }
+
+  .evaluation-card {
+    padding: 14px 16px;
+  }
+
+  .evaluation-title {
+    font-size: 16px;
+  }
+
+  .evaluation-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .evaluation-icon svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 @media (max-width: 375px) {
@@ -893,12 +1061,19 @@ watch(courses, (newCourses) => {
   .schedule-pill {
     min-width: 40px;
     padding: 4px 6px;
-  
   }
 
   .day-time {
     max-width: 40px;
     font-size: 8px;
+  }
+
+  .evaluation-title {
+    font-size: 15px;
+  }
+
+  .evaluation-subtitle {
+    font-size: 11px;
   }
 }
 
