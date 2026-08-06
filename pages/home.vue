@@ -518,9 +518,8 @@ watch(courses, (newCourses) => {
   stroke: #ffc125;
 }
 
-/* ========== QUICK ACTION SECTION WITH BREATHING ROOM ========== */
 .quick-action-section {
-  padding: 16px 20px 4px;
+  padding: 16px 20px 10px;
 }
 
 .quick-action-label {
@@ -1054,7 +1053,7 @@ watch(courses, (newCourses) => {
   }
 
   .quick-action-section {
-    padding: 12px 16px 2px;
+    padding: 12px 16px 8px;
   }
 }
 
@@ -1082,7 +1081,7 @@ watch(courses, (newCourses) => {
   }
 
   .quick-action-section {
-    padding: 10px 14px 2px;
+    padding: 10px 14px 8px;
   }
 }
 
