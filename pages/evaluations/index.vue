@@ -89,13 +89,16 @@
             </div>
 
             <div class="subjects-grid">
+              <!-- ========== SUBJECT CARD - WHOLE CARD CLICKABLE ========== -->
               <div
                 v-for="subject in survey.subjects"
                 :key="subject.id"
                 class="subject-card"
                 :class="{ submitted: subject.status === 'submitted' }"
+                @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
               >
-                <div class="subject-avatar">
+                <!-- Avatar - Separate click target (future profile) -->
+                <div class="subject-avatar" @click.stop="goToProfile(subject.id)">
                   <img
                     v-if="subject.photo_url"
                     :src="subject.photo_url"
@@ -108,20 +111,22 @@
                   </span>
                 </div>
 
+                <!-- Subject Info -->
                 <div class="subject-info">
                   <h4 class="subject-name">{{ subject.name }}</h4>
                   <span class="subject-class">{{ survey.class.name }}</span>
                 </div>
 
-                <button
-                  class="subject-status-btn"
+                <!-- Status Badge (Visual only - not clickable) -->
+                <span 
+                  class="subject-status-badge"
                   :class="subject.status === 'submitted' ? 'submitted' : 'pending'"
-                  @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
                 >
                   <span class="status-dot" :class="subject.status"></span>
                   {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
-                </button>
+                </span>
               </div>
+              <!-- ========== END SUBJECT CARD ========== -->
             </div>
           </div>
         </div>
@@ -139,6 +144,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from '#app'
 import { useLanguage } from '~/composables/useLanguage'
 import { useNavigation } from '~/composables/useNavigation'
 import { useSchool } from '~/composables/useSchool'
@@ -146,6 +152,7 @@ import { useToast } from '~/composables/useToast'
 import { useEvaluations } from '~/composables/useEvaluations'
 import ToastNotification from '~/components/ToastNotification.vue'
 
+const router = useRouter()
 const { t: translate } = useLanguage()
 const { goBack, goToEvaluation } = useNavigation()
 const { getSchoolLogo, getSchoolName } = useSchool()
@@ -192,6 +199,13 @@ const handleImageError = (event) => {
 
 const handleLogoError = (event) => {
   event.target.src = '/assets/images/logo2-modified.png'
+}
+
+// ========== PROFILE NAVIGATION (Future) ==========
+const goToProfile = (subjectId) => {
+  // For now, just log it. Future: navigate to profile page
+  console.log('🔜 Navigate to profile for subject:', subjectId)
+  // Later: router.push(`/profile/${subjectId}`)
 }
 
 onMounted(async () => {
@@ -451,6 +465,7 @@ onMounted(async () => {
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
@@ -459,10 +474,15 @@ onMounted(async () => {
   transform: translateY(-1px);
 }
 
+.subject-card:active {
+  transform: scale(0.98);
+}
+
 .subject-card.submitted {
   opacity: 0.8;
 }
 
+/* Avatar - Separate click target for future profile */
 .subject-avatar {
   width: 40px;
   height: 40px;
@@ -473,6 +493,13 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subject-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 193, 37, 0.2);
 }
 
 .subject-photo {
@@ -508,45 +535,29 @@ onMounted(async () => {
   display: block;
 }
 
-/* ========== STATUS BUTTONS ========== */
-.subject-status-btn {
+/* ========== STATUS BADGE - Visual only, not clickable ========== */
+.subject-status-badge {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  border: none;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
-/* PENDING - Yellow */
-.subject-status-btn.pending {
+.subject-status-badge.pending {
   background: #FFC125;
   color: #1e3971;
 }
 
-.subject-status-btn.pending:hover {
-  background: #ffd54f;
-  transform: scale(1.02);
-}
-
-/* SUBMITTED - Solid Green */
-.subject-status-btn.submitted {
+.subject-status-badge.submitted {
   background: #4cd964;
   color: #1e3971;
-  cursor: default;
 }
 
-.subject-status-btn.submitted:hover {
-  transform: none;
-  background: #4cd964;
-}
-
-/* Status dots */
 .status-dot {
   width: 8px;
   height: 8px;
@@ -605,7 +616,7 @@ onMounted(async () => {
     padding: 10px 12px;
   }
 
-  .subject-status-btn {
+  .subject-status-badge {
     font-size: 11px;
     padding: 4px 10px;
   }
