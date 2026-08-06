@@ -23,9 +23,9 @@
     "good": "ጥሩ",
     "average": "መካከለኛ",
     "poor": "አልበለጠም",
-     "quickAction": "ፈጣን እርምጃ",
-  "evaluations": "የግምገማ ቅኝቶች",
-  "evaluationsSubtitle": "የቀሩትን ግምገማዎች ያጠናቅቁ"
+    "quickAction": "ፈጣን እርምጃ",
+    "evaluations": "የግምገማ ቅኝቶች",
+    "evaluationsSubtitle": "የቀሩትን ግምገማዎች ያጠናቅቁ"
   },
   "nav": {
     "home": "መነሻ",
@@ -180,21 +180,27 @@
     "loadingError": "መረጃ ለመጫን አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
     "networkError": "የይነገጽ ስህተት። እባክዎ ግንኙነትዎን ያረጋግጡ።"
   },
- "evaluations": {
-  "title": "ግምገማዎች",
-  "role": "ሚና",
-  "evaluating": "→ በመገምገም ላይ",
-  "pending": "በመጠባበቅ ላይ",
-  "evaluated": "ተገምግሟል",
-  "noSurveys": "ለመገምገም ምንም የለም",
-  "noSurveysDesc": "በአሁኑ ጊዜ ምንም የሚገመገሙ ሰዎች የሉም።",
-  "typeHere": "እዚህ ይጻፉ...",
-  "requiredError": "ይህ ጥያቄ መመለስ አለበት",
-  "fillAllRequired": "እባክዎ ሁሉንም አስፈላጊ ጥያቄዎች ይመልሱ",
-  "submitEvaluation": "ግምገማ ያስገቡ",
-  "submitting": "በማስገባት ላይ...",
-  "saveSuccess": "ግምገማ በተሳካ ሁኔታ ተቀምጧል!",
-  "saveError": "ግምገማ ማስቀመጥ አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
-  "subjectNotFound": "ፈላጊው ሰው አልተገኘም። እባክዎ እንደገና ይሞክሩ።"
-}
+  "evaluations": {
+    "title": "ግምገማዎች",
+    "role": "ሚና",
+    "evaluating": "→ በመገምገም ላይ",
+    "pending": "በመጠባበቅ ላይ",
+    "evaluated": "ተገምግሟል",
+    "noSurveys": "ለመገምገም ምንም የለም",
+    "noSurveysDesc": "በአሁኑ ጊዜ ምንም የሚገመገሙ ሰዎች የሉም።",
+    "typeHere": "እዚህ ይጻፉ...",
+    "requiredError": "ይህ ጥያቄ መመለስ አለበት",
+    "fillAllRequired": "እባክዎ ሁሉንም አስፈላጊ ጥያቄዎች ይመልሱ",
+    "submitEvaluation": "ግምገማ ያስገቡ",
+    "submitting": "በማስገባት ላይ...",
+    "saveSuccess": "ግምገማ በተሳካ ሁኔታ ተቀምጧል!",
+    "saveError": "ግምገማ ማስቀመጥ አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
+    "subjectNotFound": "ፈላጊው ሰው አልተገኘም። እባክዎ እንደገና ይሞክሩ።",
+    "evaluateAs": "እንደ ሚና ገምግም",
+    "allRoles": "ሁሉም ሚናዎች",
+    "youAre": "እርስዎ እንደ",
+    "subjects": "ሰዎች",
+    "noResults": "ምንም ውጤት አልተገኘም",
+    "noResultsDesc": "ከላይ ያለውን ማጣሪያ በመቀየር ተጨማሪ ግምገማዎችን ይመልከቱ።"
+  }
 }

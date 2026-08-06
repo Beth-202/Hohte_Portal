@@ -104,9 +104,13 @@
         </div>
       </div>
 
-      <!-- Submit -->
+      <!-- SUBMIT BUTTON - FIXED -->
       <div class="submit-section">
-        <button type="submit" class="submit-btn" :disabled="isSubmitting || !isFormValid">
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          :disabled="isSubmitting || !isFormValid"
+        >
           {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
         </button>
       </div>
@@ -233,6 +237,10 @@ const submitEvaluation = async () => {
     const payload = buildPayload()
     await saveAnswers(surveyId.value, classId.value, subjectId, payload)
     success(translate('evaluations.saveSuccess'), 3000)
+    
+    // Update local subject status to 'submitted' so the badge changes
+    subject.value.status = 'submitted'
+    
     setTimeout(() => {
       router.push('/evaluations')
     }, 1500)
@@ -491,15 +499,17 @@ onMounted(loadData)
   margin-top: 8px;
 }
 
+/* ========== SUBMIT BUTTON - FIXED ========== */
 .submit-section {
-  margin-top: 24px;
+  margin-top: 30px;
   text-align: center;
+  padding: 20px 0;
 }
 
 .submit-btn {
   width: 100%;
   max-width: 400px;
-  padding: 16px 40px;
+  padding: 18px 40px;
   background: #FFC125;
   color: #1e3971;
   border: none;
@@ -507,19 +517,26 @@ onMounted(loadData)
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(30, 57, 113, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 57, 113, 0.4);
+  box-shadow: 0 8px 30px rgba(255, 193, 37, 0.4);
   background: #ffd54f;
 }
 
 .submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .error-state-full {
@@ -565,6 +582,11 @@ onMounted(loadData)
 
   .question-card {
     padding: 14px 16px;
+  }
+
+  .submit-btn {
+    font-size: 16px;
+    padding: 16px 20px;
   }
 }
 </style>

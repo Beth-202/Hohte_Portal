@@ -49,58 +49,88 @@
         <p>{{ translate('evaluations.noSurveysDesc') }}</p>
       </div>
 
-      <!-- Surveys List -->
-      <div v-else class="surveys-list">
-        <div
-          v-for="survey in surveys"
-          :key="survey.id"
-          class="survey-section"
-        >
-          <div class="survey-header">
-            <h2 class="survey-title">{{ survey.title }}</h2>
-            <span class="survey-role">
-              {{ translate('evaluations.role') }}: 
-              <strong>{{ survey.evaluator_role }}</strong>
-              → {{ translate('evaluations.evaluating') }} 
-              <strong>{{ survey.subject_role }}</strong>
-            </span>
-          </div>
-
-          <div class="subjects-grid">
-            <div
-              v-for="subject in survey.subjects"
-              :key="subject.id"
-              class="subject-card"
-              :class="{ submitted: subject.status === 'submitted' }"
+      <!-- Surveys with Dropdown -->
+      <div v-else class="surveys-wrapper">
+        <!-- Dropdown Filter -->
+        <div class="filter-section">
+          <label class="filter-label">{{ translate('evaluations.evaluateAs') }}</label>
+          <select v-model="selectedRole" class="role-dropdown">
+            <option value="all">{{ translate('evaluations.allRoles') }}</option>
+            <option 
+              v-for="role in availableRoles" 
+              :key="role"
+              :value="role"
             >
-              <div class="subject-avatar">
-                <img
-                  v-if="subject.photo_url"
-                  :src="subject.photo_url"
-                  :alt="subject.name"
-                  class="subject-photo"
-                  @error="handleImageError"
-                />
-                <span v-else class="subject-initials">
-                  {{ getInitials(subject.name) }}
+              {{ translate('evaluations.role') }}: {{ role }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Filtered Surveys List -->
+        <div class="surveys-list">
+          <div
+            v-for="survey in filteredSurveys"
+            :key="survey.id"
+            class="survey-section"
+          >
+            <div class="survey-header">
+              <div>
+                <h2 class="survey-title">{{ survey.title }}</h2>
+                <span class="survey-role-badge">
+                  {{ translate('evaluations.youAre') }}: 
+                  <strong class="role-highlight">{{ survey.evaluator_role }}</strong>
+                  {{ translate('evaluations.evaluating') }}
+                  <strong class="role-highlight">{{ survey.subject_role }}</strong>
                 </span>
               </div>
+              <span class="survey-count">
+                {{ survey.subjects.length }} {{ translate('evaluations.subjects') }}
+              </span>
+            </div>
 
-              <div class="subject-info">
-                <h4 class="subject-name">{{ subject.name }}</h4>
-                <span class="subject-class">{{ survey.class.name }}</span>
-              </div>
-
-              <button
-                class="subject-status-btn"
-                :class="subject.status === 'submitted' ? 'submitted' : 'pending'"
-                @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
+            <div class="subjects-grid">
+              <div
+                v-for="subject in survey.subjects"
+                :key="subject.id"
+                class="subject-card"
+                :class="{ submitted: subject.status === 'submitted' }"
               >
-                <span class="status-dot" :class="subject.status"></span>
-                {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
-              </button>
+                <div class="subject-avatar">
+                  <img
+                    v-if="subject.photo_url"
+                    :src="subject.photo_url"
+                    :alt="subject.name"
+                    class="subject-photo"
+                    @error="handleImageError"
+                  />
+                  <span v-else class="subject-initials">
+                    {{ getInitials(subject.name) }}
+                  </span>
+                </div>
+
+                <div class="subject-info">
+                  <h4 class="subject-name">{{ subject.name }}</h4>
+                  <span class="subject-class">{{ survey.class.name }}</span>
+                </div>
+
+                <button
+                  class="subject-status-btn"
+                  :class="subject.status === 'submitted' ? 'submitted' : 'pending'"
+                  @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
+                >
+                  <span class="status-dot" :class="subject.status"></span>
+                  {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- Empty state for filtered results -->
+        <div v-if="filteredSurveys.length === 0" class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>{{ translate('evaluations.noResults') }}</h3>
+          <p>{{ translate('evaluations.noResultsDesc') }}</p>
         </div>
       </div>
     </main>
@@ -108,7 +138,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useLanguage } from '~/composables/useLanguage'
 import { useNavigation } from '~/composables/useNavigation'
 import { useSchool } from '~/composables/useSchool'
@@ -121,6 +151,31 @@ const { goBack, goToEvaluation } = useNavigation()
 const { getSchoolLogo, getSchoolName } = useSchool()
 const { toasts, removeToast } = useToast()
 const { surveys, isLoading, fetchSurveys } = useEvaluations()
+
+// ========== DROPDOWN FILTER ==========
+const selectedRole = ref('all')
+
+// Get all unique evaluator roles from surveys
+const availableRoles = computed(() => {
+  const roles = new Set()
+  surveys.value.forEach(survey => {
+    if (survey.evaluator_role) {
+      roles.add(survey.evaluator_role)
+    }
+  })
+  return Array.from(roles)
+})
+
+// Filter surveys based on selected role
+const filteredSurveys = computed(() => {
+  if (selectedRole.value === 'all') {
+    return surveys.value
+  }
+  return surveys.value.filter(
+    survey => survey.evaluator_role === selectedRole.value
+  )
+})
+// ========== END DROPDOWN FILTER ==========
 
 const getInitials = (name) => {
   if (!name) return '?'
@@ -271,6 +326,67 @@ onMounted(async () => {
   margin: 0;
 }
 
+/* ========== SURVEYS WRAPPER ========== */
+.surveys-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ========== DROPDOWN FILTER SECTION ========== */
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #2b4b8f;
+  border-radius: 12px;
+  padding: 14px 20px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a0b3d9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-dropdown {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 16px;
+  background: #1e3971;
+  color: white;
+  border: 2px solid rgba(255, 193, 37, 0.3);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23FFC125' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: all 0.3s ease;
+}
+
+.role-dropdown:hover {
+  border-color: #FFC125;
+}
+
+.role-dropdown:focus {
+  outline: none;
+  border-color: #FFC125;
+  box-shadow: 0 0 0 3px rgba(255, 193, 37, 0.2);
+}
+
+.role-dropdown option {
+  background: #1e3971;
+  color: white;
+  padding: 8px;
+}
+
+/* ========== SURVEYS LIST ========== */
 .surveys-list {
   display: flex;
   flex-direction: column;
@@ -287,7 +403,7 @@ onMounted(async () => {
 .survey-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
@@ -299,19 +415,26 @@ onMounted(async () => {
   font-size: 18px;
   font-weight: 600;
   color: white;
-  margin: 0;
+  margin: 0 0 4px 0;
 }
 
-.survey-role {
+.survey-role-badge {
   font-size: 13px;
+  color: #a0b3d9;
+}
+
+.survey-role-badge .role-highlight {
   color: #FFC125;
-  background: rgba(255, 193, 37, 0.15);
+  font-weight: 600;
+}
+
+.survey-count {
+  font-size: 13px;
+  color: #a0b3d9;
+  background: rgba(255, 255, 255, 0.05);
   padding: 4px 12px;
   border-radius: 20px;
-}
-
-.survey-role strong {
-  color: white;
+  white-space: nowrap;
 }
 
 .subjects-grid {
@@ -320,6 +443,7 @@ onMounted(async () => {
   gap: 12px;
 }
 
+/* ========== SUBJECT CARDS ========== */
 .subject-card {
   display: flex;
   align-items: center;
@@ -336,7 +460,7 @@ onMounted(async () => {
 }
 
 .subject-card.submitted {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .subject-avatar {
@@ -384,20 +508,22 @@ onMounted(async () => {
   display: block;
 }
 
+/* ========== STATUS BUTTONS ========== */
 .subject-status-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border: none;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
+/* PENDING - Yellow */
 .subject-status-btn.pending {
   background: #FFC125;
   color: #1e3971;
@@ -408,12 +534,19 @@ onMounted(async () => {
   transform: scale(1.02);
 }
 
+/* SUBMITTED - Solid Green */
 .subject-status-btn.submitted {
-  background: rgba(76, 217, 100, 0.2);
-  color: #4cd964;
+  background: #4cd964;
+  color: #1e3971;
   cursor: default;
 }
 
+.subject-status-btn.submitted:hover {
+  transform: none;
+  background: #4cd964;
+}
+
+/* Status dots */
 .status-dot {
   width: 8px;
   height: 8px;
@@ -422,14 +555,15 @@ onMounted(async () => {
 }
 
 .status-dot.pending {
-  background: #FFC125;
+  background: #1e3971;
 }
 
 .status-dot.submitted {
-  background: #4cd964;
+  background: #1e3971;
 }
 
-@media (max-width: 480px) {
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
   .subjects-grid {
     grid-template-columns: 1fr;
   }
@@ -446,6 +580,38 @@ onMounted(async () => {
   .logo-image {
     width: 70px;
     height: 70px;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .role-dropdown {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .evaluations-main {
+    padding: 12px;
+  }
+
+  .survey-section {
+    padding: 14px;
+  }
+
+  .subject-card {
+    padding: 10px 12px;
+  }
+
+  .subject-status-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .survey-title {
+    font-size: 16px;
   }
 }
 </style>
