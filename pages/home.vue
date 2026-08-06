@@ -58,7 +58,7 @@
         </span>
       </div>
 
-      <!-- ========== NEW: EVALUATION QUICK ACTION ========== -->
+      <!-- ========== QUICK ACTION SECTION WITH BREATHING ROOM ========== -->
       <div class="quick-action-section">
         <p class="quick-action-label">{{ t('home.quickAction') }}</p>
         <div class="evaluation-card" @click="goToEvaluations">
@@ -83,7 +83,7 @@
           </span>
         </div>
       </div>
-      <!-- ========== END EVALUATION QUICK ACTION ========== -->
+      <!-- ========== END QUICK ACTION SECTION ========== -->
 
       <section class="courses-section">
         <h2 class="section-title">{{ t('home.myCourses') }}</h2>
@@ -226,7 +226,7 @@ import { useSchool } from '~/composables/useSchool'
 import classImage from '~/assets/images/class_image.png'
 
 const router = useRouter()
-const { locale, t, setLocale } = useLanguage()
+const { t, setLocale, locale } = useLanguage()
 const { goToPermissionStatus, goToCourseDetail } = useNavigation()
 const { student, courses, attendance, pendingRequestsCount, initializeData, isLoading, error } = useStudentData()
 const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool()
@@ -478,7 +478,7 @@ watch(courses, (newCourses) => {
   background: #2b4b8f;
 }
 
-/* ========== EXISTING ALERT BOX ========== */
+/* ========== ALERT BOX ========== */
 .alert-box {
   background: rgba(255, 255, 255, 0.1);
   color: #ffc125;
@@ -518,16 +518,16 @@ watch(courses, (newCourses) => {
   stroke: #ffc125;
 }
 
-/* ========== NEW: QUICK ACTION SECTION ========== */
+/* ========== QUICK ACTION SECTION WITH BREATHING ROOM ========== */
 .quick-action-section {
-  padding: 8px 20px 0;
+  padding: 16px 20px 4px;
 }
 
 .quick-action-label {
   font-size: 14px;
   font-weight: 600;
   color: #a0b3d9;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -544,6 +544,7 @@ watch(courses, (newCourses) => {
   box-shadow: 0 4px 20px rgba(255, 193, 37, 0.25);
   position: relative;
   overflow: hidden;
+  margin-bottom: 4px;
 }
 
 /* Glow effect */
@@ -633,8 +634,8 @@ watch(courses, (newCourses) => {
   opacity: 1;
   transform: translateX(3px);
 }
+/* ========== END QUICK ACTION SECTION ========== */
 
-/* ========== REST OF YOUR EXISTING STYLES ========== */
 .section-title {
   font-size: 24px;
   font-weight: 800;
@@ -1051,6 +1052,10 @@ watch(courses, (newCourses) => {
     width: 22px;
     height: 22px;
   }
+
+  .quick-action-section {
+    padding: 12px 16px 2px;
+  }
 }
 
 @media (max-width: 375px) {
@@ -1074,6 +1079,10 @@ watch(courses, (newCourses) => {
 
   .evaluation-subtitle {
     font-size: 11px;
+  }
+
+  .quick-action-section {
+    padding: 10px 14px 2px;
   }
 }
 
