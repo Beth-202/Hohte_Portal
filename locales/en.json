@@ -176,5 +176,23 @@
     "noRequests": "No requests found",
     "loadingError": "Failed to load data. Please try again.",
     "networkError": "Network error. Please check your connection."
-  }
+  },
+  "evaluations": {
+  "title": "Evaluations",
+  "role": "Role",
+  "pending": "Pending",
+  "evaluated": "Evaluated",
+  "evaluating": "Evaluating",
+  "noSurveys": "No evaluations to complete",
+  "noSurveysDesc": "You don't have any pending evaluations at this time.",
+  "typeHere": "Type here...",
+  "requiredError": "This question is required",
+  "fillAllRequired": "Please answer all required questions",
+  "submitEvaluation": "Submit Evaluation",
+  "submitting": "Submitting...",
+  "saveSuccess": "Evaluation saved successfully!",
+  "saveError": "Failed to save evaluation. Please try again.",
+  "subjectNotFound": "Subject not found. Please try again."
+}
+
 }

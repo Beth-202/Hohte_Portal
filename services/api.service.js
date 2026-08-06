@@ -134,6 +134,7 @@ export class ApiService {
     }
   }
 
+  // ========== AUTH METHODS ==========
   async telegramLogin(initData) {
     return this.request("/api/v1/auth/telegram/login", {
       method: "POST",
@@ -220,6 +221,40 @@ export class ApiService {
     return this.request(`/api/v1/student/permission-requests/${id}`, {
       method: "DELETE",
     });
+  }
+
+  // ========== NEW: EVALUATIONS METHODS ==========
+  
+  /**
+   * Get all open surveys for the logged-in user
+   * GET /api/v1/surveys
+   */
+  async getEvaluations() {
+    return this.request("/api/v1/surveys");
+  }
+
+  /**
+   * Get saved answers for a specific subject
+   * GET /api/v1/surveys/{survey}/classes/{class}/subjects/{subject}
+   */
+  async getEvaluationAnswers(surveyId, classId, subjectId) {
+    return this.request(
+      `/api/v1/surveys/${surveyId}/classes/${classId}/subjects/${subjectId}`
+    );
+  }
+
+  /**
+   * Save/overwrite answers for a specific subject
+   * PUT /api/v1/surveys/{survey}/classes/{class}/subjects/{subject}
+   */
+  async saveEvaluationAnswers(surveyId, classId, subjectId, answers) {
+    return this.request(
+      `/api/v1/surveys/${surveyId}/classes/${classId}/subjects/${subjectId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ answers }),
+      }
+    );
   }
 }
 

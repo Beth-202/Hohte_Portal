@@ -176,5 +176,22 @@
     "noRequests": "ምንም ጥያቄ አልተገኘም",
     "loadingError": "መረጃ ለመጫን አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
     "networkError": "የይነገጽ ስህተት። እባክዎ ግንኙነትዎን ያረጋግጡ።"
-  }
+  },
+  "evaluations": {
+  "title": "ግምገማዎች",
+  "role": "ሚና",
+  "pending": "በመጠባበቅ ላይ",
+  "evaluated": "ተገምግሟል",
+  "evaluating": "በመገምገም ላይ",
+  "noSurveys": "ለመገምገም ምንም የለም",
+  "noSurveysDesc": "በአሁኑ ጊዜ ምንም የሚገመገሙ ሰዎች የሉም።",
+  "typeHere": "እዚህ ይጻፉ...",
+  "requiredError": "ይህ ጥያቄ መመለስ አለበት",
+  "fillAllRequired": "እባክዎ ሁሉንም አስፈላጊ ጥያቄዎች ይመልሱ",
+  "submitEvaluation": "ግምገማ ያስገቡ",
+  "submitting": "በማስገባት ላይ...",
+  "saveSuccess": "ግምገማ በተሳካ ሁኔታ ተቀምጧል!",
+  "saveError": "ግምገማ ማስቀመጥ አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
+  "subjectNotFound": "ፈላጊው ሰው አልተገኘም። እባክዎ እንደገና ይሞክሩ።"
+}
 }

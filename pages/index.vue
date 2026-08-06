@@ -185,7 +185,6 @@ const imageError = ref(false);
 
 const handleImageError = () => {
   imageError.value = true;
-  // Fallback to default logo
   console.error('Logo failed to load');
 };
 

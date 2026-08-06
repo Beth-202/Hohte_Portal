@@ -1,3 +1,4 @@
+// services/navigation.service.js
 export class NavigationService {
   constructor() {
     this.routes = {
@@ -11,6 +12,15 @@ export class NavigationService {
       permissionStatus: {
         path: "/permission/status",
         name: "permission-status",
+      },
+      // ========== NEW: EVALUATIONS ROUTES ==========
+      evaluations: {
+        path: "/evaluations",
+        name: "evaluations",
+      },
+      evaluationForm: {
+        path: "/evaluations/:subjectId",
+        name: "evaluations-subjectId",
       },
       messages: { path: "/messages", name: "messages" },
       alerts: { path: "/alerts", name: "alerts" },
@@ -42,6 +52,8 @@ export class NavigationService {
       "/courses/*": "courses",
       "/permission/request": "permission",
       "/permission/status": "status",
+      "/evaluations": "evaluations",
+      "/evaluations/*": "evaluations",
       "/messages": "messages",
       "/alerts": "alerts",
     };
@@ -58,6 +70,48 @@ export class NavigationService {
       }
     }
     return "home";
+  }
+
+  // ========== NAVIGATION METHODS ==========
+  goBack(router) {
+    router.back();
+  }
+
+  goToHome(router) {
+    this.navigate(router, "home");
+  }
+
+  goToCourses(router) {
+    this.navigate(router, "courses");
+  }
+
+  goToCourseDetail(router, id) {
+    this.navigate(router, "courseDetail", { id });
+  }
+
+  goToPermissionRequest(router) {
+    this.navigate(router, "permissionRequest");
+  }
+
+  goToPermissionStatus(router) {
+    this.navigate(router, "permissionStatus");
+  }
+
+  // ========== NEW: EVALUATIONS NAVIGATION ==========
+  goToEvaluations(router) {
+    this.navigate(router, "evaluations");
+  }
+
+  goToEvaluation(router, subjectId) {
+    this.navigate(router, "evaluationForm", { subjectId });
+  }
+
+  goToMessages(router) {
+    this.navigate(router, "messages");
+  }
+
+  goToAlerts(router) {
+    this.navigate(router, "alerts");
   }
 }
 

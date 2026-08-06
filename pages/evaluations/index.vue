@@ -1,0 +1,434 @@
+<template>
+  <div class="evaluations-container">
+    <!-- Toast Container -->
+    <div class="toast-container">
+      <ToastNotification
+        v-for="toast in toasts"
+        :key="toast.id"
+        :message="toast.message"
+        :type="toast.type"
+        :duration="toast.duration"
+        @close="removeToast(toast.id)"
+      />
+    </div>
+
+    <!-- Header -->
+    <header class="evaluations-header">
+      <div class="logo-center">
+        <img
+          :src="getSchoolLogo()"
+          :alt="getSchoolName() + ' Logo'"
+          class="logo-image"
+          @error="handleLogoError"
+        />
+      </div>
+
+      <div class="header-content">
+        <button class="back-button" @click="goBack">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <h1 class="page-title">{{ t('evaluations.title') }}</h1>
+        <div class="header-right"></div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ t('common.loading') }}</p>
+    </div>
+
+    <!-- Content -->
+    <main v-else class="evaluations-main">
+      <!-- No Surveys -->
+      <div v-if="surveys.length === 0" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>{{ t('evaluations.noSurveys') }}</h3>
+        <p>{{ t('evaluations.noSurveysDesc') }}</p>
+      </div>
+
+      <!-- Surveys List -->
+      <div v-else class="surveys-list">
+        <div
+          v-for="survey in surveys"
+          :key="survey.id"
+          class="survey-section"
+        >
+          <div class="survey-header">
+            <h2 class="survey-title">{{ survey.title }}</h2>
+            <span class="survey-role">{{ t('evaluations.role') }}: {{ survey.evaluator_role }}</span>
+          </div>
+
+          <div class="subjects-grid">
+            <div
+              v-for="subject in survey.subjects"
+              :key="subject.id"
+              class="subject-card"
+              :class="{ submitted: subject.status === 'submitted' }"
+            >
+              <div class="subject-avatar">
+                <img
+                  v-if="subject.photo_url"
+                  :src="subject.photo_url"
+                  :alt="subject.name"
+                  class="subject-photo"
+                  @error="handleImageError"
+                />
+                <span v-else class="subject-initials">
+                  {{ getInitials(subject.name) }}
+                </span>
+              </div>
+
+              <div class="subject-info">
+                <h4 class="subject-name">{{ subject.name }}</h4>
+              </div>
+
+              <button
+                class="subject-status-btn"
+                :class="subject.status === 'submitted' ? 'submitted' : 'pending'"
+                @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
+              >
+                <span class="status-dot" :class="subject.status"></span>
+                {{ subject.status === 'submitted' ? t('evaluations.evaluated') : t('evaluations.pending') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useLanguage } from '~/composables/useLanguage'
+import { useNavigation } from '~/composables/useNavigation'
+import { useSchool } from '~/composables/useSchool'
+import { useToast } from '~/composables/useToast'
+import { useEvaluations } from '~/composables/useEvaluations'
+import ToastNotification from '~/components/ToastNotification.vue'
+
+const { t } = useLanguage()
+const { goBack, goToEvaluation } = useNavigation()
+const { getSchoolLogo, getSchoolName } = useSchool()
+const { toasts, removeToast } = useToast()
+const { surveys, isLoading, fetchSurveys } = useEvaluations()
+
+const getInitials = (name) => {
+  if (!name) return '?'
+  const parts = name.split(' ')
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
+}
+
+const handleImageError = (event) => {
+  event.target.style.display = 'none'
+}
+
+const handleLogoError = (event) => {
+  event.target.src = '/assets/images/logo2-modified.png'
+}
+
+onMounted(async () => {
+  await fetchSurveys()
+})
+</script>
+
+<style scoped>
+.evaluations-container {
+  min-height: 100vh;
+  background: #1e3971;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: 40px;
+}
+
+.toast-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.evaluations-header {
+  background: #1e3971;
+  padding: 20px 20px 16px;
+  color: white;
+}
+
+.logo-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.logo-image {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.header-content {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  text-align: center;
+}
+
+.header-right {
+  grid-column: 3;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: white;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #FFC125;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.evaluations-main {
+  padding: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #2b4b8f;
+  border-radius: 16px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  color: #a0b3d9;
+  font-size: 14px;
+  margin: 0;
+}
+
+.surveys-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.survey-section {
+  background: #2b4b8f;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.survey-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.survey-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.survey-role {
+  font-size: 13px;
+  color: #FFC125;
+  background: rgba(255, 193, 37, 0.15);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.subject-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.subject-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.subject-card.submitted {
+  opacity: 0.7;
+}
+
+.subject-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1e3971;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.subject-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.subject-initials {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.subject-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.subject-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subject-status-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.subject-status-btn.pending {
+  background: #FFC125;
+  color: #1e3971;
+}
+
+.subject-status-btn.pending:hover {
+  background: #ffd54f;
+  transform: scale(1.02);
+}
+
+.subject-status-btn.submitted {
+  background: rgba(76, 217, 100, 0.2);
+  color: #4cd964;
+  cursor: default;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.pending {
+  background: #FFC125;
+}
+
+.status-dot.submitted {
+  background: #4cd964;
+}
+
+@media (max-width: 480px) {
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .survey-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .logo-image {
+    width: 70px;
+    height: 70px;
+  }
+}
+</style>
