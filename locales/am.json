@@ -205,6 +205,7 @@
     "editEvaluation": "ግምገማ ያርትዑ",
     "updateEvaluation": "ግምገማ ያዘምኑ",
     "updateSuccess": "ግምገማ በተሳካ ሁኔታ ተዘምኗል!",
-    "filterByRole": "በሚና አጣራ"
+    "filterByRole": "በሚና አጣራ",
+      "cancel": "ሰርዝ"
   }
 }

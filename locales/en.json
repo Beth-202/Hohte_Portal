@@ -205,7 +205,9 @@
     "editEvaluation": "Edit Evaluation",
     "updateEvaluation": "Update Evaluation",
     "updateSuccess": "Evaluation updated successfully!",
-      "filterByRole": "Filter by Role"
+      "filterByRole": "Filter by Role",
+        "cancel": "Cancel"
+      
 
   }
 }

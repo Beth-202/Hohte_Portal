@@ -104,29 +104,47 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
+      <!-- ========== SMART BUTTON SECTION ========== -->
       <div class="submit-section">
         <div class="submit-spacer"></div>
         
+        <!-- Pending (first time) → Submit -->
         <button 
-          v-if="subject?.status === 'submitted' && !isEditing"
+          v-if="subject?.status === 'pending'"
+          type="submit" 
+          class="submit-btn" 
+          :disabled="isSubmitting || !isFormValid"
+        >
+          {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
+        </button>
+        
+        <!-- Evaluated with changes → Update + Cancel -->
+        <div v-else-if="subject?.status === 'submitted' && hasChanges" class="button-group">
+          <button 
+            type="button"
+            class="submit-btn cancel-btn"
+            @click="cancelChanges"
+          >
+            {{ translate('evaluations.cancel') }}
+          </button>
+          <button 
+            type="submit" 
+            class="submit-btn update-btn" 
+            :disabled="isSubmitting || !isFormValid"
+          >
+            {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.updateEvaluation') }}
+          </button>
+        </div>
+        
+        <!-- Evaluated with no changes → Edit (inviting action) -->
+        <button 
+          v-else-if="subject?.status === 'submitted' && !hasChanges"
           type="button"
           class="submit-btn edit-mode"
           @click="enableEdit"
         >
           {{ translate('evaluations.editEvaluation') }}
         </button>
-        
-        <button 
-          v-else
-          type="submit" 
-          class="submit-btn" 
-          :disabled="isSubmitting || !isFormValid"
-        >
-          {{ isSubmitting ? translate('evaluations.submitting') : (isEditing ? translate('evaluations.updateEvaluation') : translate('evaluations.submitEvaluation')) }}
-        </button>
-        
-        <div class="submit-bottom-spacer"></div>
       </div>
     </form>
 
@@ -142,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from '#app'
 import { useLanguage } from '~/composables/useLanguage'
 import { useNavigation } from '~/composables/useNavigation'
@@ -166,9 +184,15 @@ const classId = ref(null)
 const survey = ref(null)
 const subject = ref(null)
 const answers = ref({})
+const originalAnswersString = ref('')
 const isSubmitting = ref(false)
-const isEditing = ref(false)
 
+// ========== CHANGE DETECTION ==========
+const hasChanges = computed(() => {
+  return JSON.stringify(answers.value) !== originalAnswersString.value
+})
+
+// ========== FORM VALIDATION ==========
 const getInitials = (name) => {
   if (!name) return '?'
   const parts = name.split(' ')
@@ -241,10 +265,25 @@ const buildPayload = () => {
   return payload
 }
 
-const enableEdit = () => {
-  isEditing.value = true
+// ========== SAVE ORIGINAL STATE ==========
+const saveOriginalState = () => {
+  originalAnswersString.value = JSON.stringify(answers.value)
 }
 
+// ========== CANCEL CHANGES ==========
+const cancelChanges = () => {
+  // Revert to original state
+  answers.value = JSON.parse(originalAnswersString.value)
+}
+
+// ========== ENABLE EDIT ==========
+const enableEdit = () => {
+  // Nothing to do - page is always editable
+  // This is just a visual cue button
+  console.log('📝 Edit mode enabled')
+}
+
+// ========== SUBMIT ==========
 const submitEvaluation = async () => {
   if (!isFormValid.value) {
     error(translate('evaluations.fillAllRequired'), 3000)
@@ -256,14 +295,13 @@ const submitEvaluation = async () => {
     const payload = buildPayload()
     await saveAnswers(surveyId.value, classId.value, subjectId, payload)
     
-    if (isEditing.value) {
-      success(translate('evaluations.updateSuccess'), 3000)
-    } else {
-      success(translate('evaluations.saveSuccess'), 3000)
-    }
-    
+    // Update local subject status
     subject.value.status = 'submitted'
-    isEditing.value = false
+    
+    // Update original state to match new saved state
+    saveOriginalState()
+    
+    success(translate('evaluations.saveSuccess'), 3000)
     
     setTimeout(() => {
       router.push('/evaluations')
@@ -276,6 +314,7 @@ const submitEvaluation = async () => {
   }
 }
 
+// ========== LOAD DATA ==========
 const loadData = async () => {
   await fetchSurveys()
   
@@ -297,10 +336,13 @@ const loadData = async () => {
     return
   }
 
+  // If already submitted, fetch saved answers
   if (subject.value.status === 'submitted') {
     try {
       const saved = await fetchAnswers(surveyId.value, classId.value, subjectId)
       if (saved && saved.answers) {
+        // Reset answers
+        answers.value = {}
         for (const ans of saved.answers) {
           if (ans.rating !== null) {
             answers.value[ans.question_id] = { type: 'rating', value: ans.rating, text: null }
@@ -310,10 +352,15 @@ const loadData = async () => {
             answers.value[ans.question_id] = { type: 'text', value: null, text: ans.text }
           }
         }
+        // Save original state for change detection
+        saveOriginalState()
       }
     } catch (err) {
       console.error('Failed to load saved answers:', err)
     }
+  } else {
+    // For pending, save empty state as original
+    saveOriginalState()
   }
 }
 
@@ -522,6 +569,7 @@ onMounted(loadData)
   margin-top: 8px;
 }
 
+/* ========== SMART BUTTON SECTION ========== */
 .submit-section {
   margin-top: 50px;
   text-align: center;
@@ -532,23 +580,34 @@ onMounted(loadData)
   height: 30px;
 }
 
+.button-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .submit-btn {
   width: 100%;
   max-width: 400px;
   padding: 20px 40px;
-  background: #FFC125;
-  color: #1e3971;
   border: none;
   border-radius: 12px;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
   text-transform: uppercase;
   letter-spacing: 1px;
   position: relative;
   z-index: 10;
+}
+
+/* Primary - Submit / Update */
+.submit-btn {
+  background: #FFC125;
+  color: #1e3971;
+  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -567,15 +626,48 @@ onMounted(loadData)
   transform: scale(0.98);
 }
 
+/* Edit mode - inviting, not a primary action */
 .submit-btn.edit-mode {
-  background: #4a6fc1;
-  color: white;
-  box-shadow: 0 4px 20px rgba(74, 111, 193, 0.3);
+  background: rgba(74, 111, 193, 0.3);
+  color: #a0b3d9;
+  box-shadow: none;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
 }
 
 .submit-btn.edit-mode:hover:not(:disabled) {
-  background: #5a7fd1;
-  box-shadow: 0 8px 30px rgba(74, 111, 193, 0.4);
+  background: rgba(74, 111, 193, 0.5);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(74, 111, 193, 0.2);
+}
+
+/* Cancel button */
+.submit-btn.cancel-btn {
+  max-width: 120px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ff5656;
+  box-shadow: none;
+  border: 1px solid rgba(255, 86, 86, 0.3);
+  padding: 20px 20px;
+}
+
+.submit-btn.cancel-btn:hover:not(:disabled) {
+  background: rgba(255, 86, 86, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Update button (when changes exist) */
+.submit-btn.update-btn {
+  background: #FFC125;
+  color: #1e3971;
+  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
+  max-width: 260px;
+}
+
+.submit-btn.update-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 193, 37, 0.4);
+  background: #ffd54f;
 }
 
 .submit-bottom-spacer {
@@ -633,6 +725,17 @@ onMounted(loadData)
     padding: 18px 20px;
   }
 
+  .submit-btn.cancel-btn {
+    max-width: 100px;
+    padding: 18px 14px;
+    font-size: 14px;
+  }
+
+  .submit-btn.update-btn {
+    max-width: 200px;
+    padding: 18px 20px;
+  }
+
   .submit-section {
     margin-top: 35px;
     padding: 5px 0;
@@ -644,6 +747,10 @@ onMounted(loadData)
 
   .submit-bottom-spacer {
     height: 40px;
+  }
+
+  .button-group {
+    gap: 8px;
   }
 }
 </style>
