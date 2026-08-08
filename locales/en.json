@@ -183,7 +183,7 @@
   "evaluations": {
     "title": "Evaluations",
     "role": "Role",
-    "evaluating": "→ Evaluating",
+    "evaluating": " Evaluating",
     "pending": "Pending",
     "evaluated": "Evaluated",
     "noSurveys": "No evaluations to complete",
