@@ -118,21 +118,21 @@
           {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.submitEvaluation') }}
         </button>
         
-        <!-- Evaluated with changes → Update + Cancel -->
+        <!-- Evaluated with changes → Update + Cancel (side by side) -->
         <div v-else-if="subject?.status === 'submitted' && hasChanges" class="button-group">
-          <button 
-            type="button"
-            class="submit-btn cancel-btn"
-            @click="cancelChanges"
-          >
-            {{ translate('evaluations.cancel') }}
-          </button>
           <button 
             type="submit" 
             class="submit-btn update-btn" 
             :disabled="isSubmitting || !isFormValid"
           >
             {{ isSubmitting ? translate('evaluations.submitting') : translate('evaluations.updateEvaluation') }}
+          </button>
+          <button 
+            type="button"
+            class="submit-btn cancel-btn"
+            @click="cancelChanges"
+          >
+            {{ translate('evaluations.cancel') }}
           </button>
         </div>
         
@@ -160,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from '#app'
 import { useLanguage } from '~/composables/useLanguage'
 import { useNavigation } from '~/composables/useNavigation'
@@ -272,14 +272,11 @@ const saveOriginalState = () => {
 
 // ========== CANCEL CHANGES ==========
 const cancelChanges = () => {
-  // Revert to original state
   answers.value = JSON.parse(originalAnswersString.value)
 }
 
 // ========== ENABLE EDIT ==========
 const enableEdit = () => {
-  // Nothing to do - page is always editable
-  // This is just a visual cue button
   console.log('📝 Edit mode enabled')
 }
 
@@ -295,10 +292,7 @@ const submitEvaluation = async () => {
     const payload = buildPayload()
     await saveAnswers(surveyId.value, classId.value, subjectId, payload)
     
-    // Update local subject status
     subject.value.status = 'submitted'
-    
-    // Update original state to match new saved state
     saveOriginalState()
     
     success(translate('evaluations.saveSuccess'), 3000)
@@ -336,12 +330,10 @@ const loadData = async () => {
     return
   }
 
-  // If already submitted, fetch saved answers
   if (subject.value.status === 'submitted') {
     try {
       const saved = await fetchAnswers(surveyId.value, classId.value, subjectId)
       if (saved && saved.answers) {
-        // Reset answers
         answers.value = {}
         for (const ans of saved.answers) {
           if (ans.rating !== null) {
@@ -352,14 +344,12 @@ const loadData = async () => {
             answers.value[ans.question_id] = { type: 'text', value: null, text: ans.text }
           }
         }
-        // Save original state for change detection
         saveOriginalState()
       }
     } catch (err) {
       console.error('Failed to load saved answers:', err)
     }
   } else {
-    // For pending, save empty state as original
     saveOriginalState()
   }
 }
@@ -580,16 +570,17 @@ onMounted(loadData)
   height: 30px;
 }
 
+/* ========== BUTTON GROUP - SIDE BY SIDE ========== */
 .button-group {
   display: flex;
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .submit-btn {
-  width: 100%;
-  max-width: 400px;
   padding: 20px 40px;
   border: none;
   border-radius: 12px;
@@ -603,11 +594,13 @@ onMounted(loadData)
   z-index: 10;
 }
 
-/* Primary - Submit / Update */
+/* Primary - Submit */
 .submit-btn {
   background: #FFC125;
   color: #1e3971;
   box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
+  max-width: 400px;
+  width: 100%;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -626,29 +619,38 @@ onMounted(loadData)
   transform: scale(0.98);
 }
 
-/* Edit mode - inviting, not a primary action */
-.submit-btn.edit-mode {
-  background: rgba(74, 111, 193, 0.3);
-  color: #a0b3d9;
-  box-shadow: none;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+/* Update button - wider, primary action */
+.submit-btn.update-btn {
+  flex: 2;
+  background: #FFC125;
+  color: #1e3971;
+  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
+  min-width: 180px;
+  max-width: unset;
 }
 
-.submit-btn.edit-mode:hover:not(:disabled) {
-  background: rgba(74, 111, 193, 0.5);
-  color: white;
+.submit-btn.update-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(74, 111, 193, 0.2);
+  box-shadow: 0 8px 30px rgba(255, 193, 37, 0.4);
+  background: #ffd54f;
 }
 
-/* Cancel button */
+.submit-btn.update-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Cancel button - smaller, secondary */
 .submit-btn.cancel-btn {
-  max-width: 120px;
+  flex: 1;
   background: rgba(255, 255, 255, 0.05);
   color: #ff5656;
   box-shadow: none;
   border: 1px solid rgba(255, 86, 86, 0.3);
   padding: 20px 20px;
+  min-width: 80px;
+  max-width: unset;
 }
 
 .submit-btn.cancel-btn:hover:not(:disabled) {
@@ -656,18 +658,21 @@ onMounted(loadData)
   transform: translateY(-2px);
 }
 
-/* Update button (when changes exist) */
-.submit-btn.update-btn {
-  background: #FFC125;
-  color: #1e3971;
-  box-shadow: 0 4px 20px rgba(255, 193, 37, 0.3);
-  max-width: 260px;
+/* Edit mode - inviting, not a primary action */
+.submit-btn.edit-mode {
+  background: rgba(74, 111, 193, 0.3);
+  color: #a0b3d9;
+  box-shadow: none;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  max-width: 400px;
+  width: 100%;
 }
 
-.submit-btn.update-btn:hover:not(:disabled) {
+.submit-btn.edit-mode:hover:not(:disabled) {
+  background: rgba(74, 111, 193, 0.5);
+  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255, 193, 37, 0.4);
-  background: #ffd54f;
+  box-shadow: 0 4px 20px rgba(74, 111, 193, 0.2);
 }
 
 .submit-bottom-spacer {
@@ -702,6 +707,7 @@ onMounted(loadData)
   cursor: pointer;
 }
 
+/* ========== RESPONSIVE ========== */
 @media (max-width: 480px) {
   .evaluation-form-container {
     padding: 16px;
@@ -726,14 +732,8 @@ onMounted(loadData)
   }
 
   .submit-btn.cancel-btn {
-    max-width: 100px;
     padding: 18px 14px;
     font-size: 14px;
-  }
-
-  .submit-btn.update-btn {
-    max-width: 200px;
-    padding: 18px 20px;
   }
 
   .submit-section {
@@ -751,6 +751,39 @@ onMounted(loadData)
 
   .button-group {
     gap: 8px;
+    max-width: 100%;
+  }
+
+  .submit-btn.update-btn {
+    flex: 2;
+    min-width: 140px;
+    padding: 18px 16px;
+    font-size: 16px;
+  }
+
+  .submit-btn.cancel-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 18px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .button-group {
+    flex-direction: column;
+  }
+
+  .submit-btn.update-btn,
+  .submit-btn.cancel-btn {
+    flex: 1;
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+  }
+
+  .submit-btn.cancel-btn {
+    padding: 14px 20px;
   }
 }
 </style>
