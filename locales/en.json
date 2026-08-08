@@ -204,6 +204,8 @@
     "noResultsDesc": "Try changing the filter above to see more evaluations.",
     "editEvaluation": "Edit Evaluation",
     "updateEvaluation": "Update Evaluation",
-    "updateSuccess": "Evaluation updated successfully!"
+    "updateSuccess": "Evaluation updated successfully!",
+      "filterByRole": "Filter by Role"
+
   }
 }

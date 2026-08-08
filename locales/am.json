@@ -204,6 +204,7 @@
     "noResultsDesc": "ከላይ ያለውን ማጣሪያ በመቀየር ተጨማሪ ግምገማዎችን ይመልከቱ።",
     "editEvaluation": "ግምገማ ያርትዑ",
     "updateEvaluation": "ግምገማ ያዘምኑ",
-    "updateSuccess": "ግምገማ በተሳካ ሁኔታ ተዘምኗል!"
+    "updateSuccess": "ግምገማ በተሳካ ሁኔታ ተዘምኗል!",
+    "filterByRole": "በሚና አጣራ"
   }
 }

@@ -104,11 +104,11 @@
         </div>
       </div>
 
-      <!-- ========== SUBMIT BUTTON WITH EDIT MODE & BREATHING ROOM ========== -->
+      <!-- ========== SUBMIT BUTTON WITH SINGLE CLICK ========== -->
       <div class="submit-section">
         <div class="submit-spacer"></div>
         
-        <!-- If already submitted and not in edit mode → Show "Edit" button -->
+        <!-- Edit button for submitted evaluations -->
         <button 
           v-if="subject?.status === 'submitted' && !isEditing"
           type="button"
@@ -118,7 +118,7 @@
           {{ translate('evaluations.editEvaluation') }}
         </button>
         
-        <!-- Otherwise show Submit/Update button -->
+        <!-- Submit/Update button -->
         <button 
           v-else
           type="submit" 

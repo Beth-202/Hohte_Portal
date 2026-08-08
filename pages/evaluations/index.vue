@@ -51,9 +51,9 @@
 
       <!-- Surveys with Dropdown -->
       <div v-else class="surveys-wrapper">
-        <!-- Dropdown Filter -->
-        <div class="filter-section">
-          <label class="filter-label">{{ translate('evaluations.evaluateAs') }}</label>
+        <!-- ========== DROPDOWN FILTER - HIDE WHEN ONLY 1 ROLE ========== -->
+        <div v-if="availableRoles.length > 1" class="filter-section">
+          <label class="filter-label">{{ translate('evaluations.filterByRole') }}</label>
           <select v-model="selectedRole" class="role-dropdown">
             <option value="all">{{ translate('evaluations.allRoles') }}</option>
             <option 
@@ -61,7 +61,7 @@
               :key="role"
               :value="role"
             >
-              {{ translate('evaluations.role') }}: {{ role }}
+              {{ role }}
             </option>
           </select>
         </div>
@@ -79,7 +79,7 @@
                 <span class="survey-role-badge">
                   {{ translate('evaluations.youAre') }}: 
                   <strong class="role-highlight">{{ survey.evaluator_role }}</strong>
-                  {{ translate('evaluations.evaluating') }}
+                  → 
                   <strong class="role-highlight">{{ survey.subject_role }}</strong>
                 </span>
               </div>
@@ -89,7 +89,7 @@
             </div>
 
             <div class="subjects-grid">
-              <!-- ========== SUBJECT CARD - WHOLE CARD CLICKABLE ========== -->
+              <!-- Subject Card -->
               <div
                 v-for="subject in survey.subjects"
                 :key="subject.id"
@@ -97,7 +97,7 @@
                 :class="{ submitted: subject.status === 'submitted' }"
                 @click="goToEvaluation(survey.id, survey.class.id, subject.id)"
               >
-                <!-- Avatar - Separate click target (future profile) -->
+                <!-- Avatar -->
                 <div class="subject-avatar" @click.stop="goToProfile(subject.id)">
                   <img
                     v-if="subject.photo_url"
@@ -115,9 +115,10 @@
                 <div class="subject-info">
                   <h4 class="subject-name">{{ subject.name }}</h4>
                   <span class="subject-class">{{ survey.class.name }}</span>
+                  <span class="subject-survey-title">{{ survey.title }}</span>
                 </div>
 
-                <!-- Status Badge (Visual only - not clickable) -->
+                <!-- Status Badge (Visual only) -->
                 <span 
                   class="subject-status-badge"
                   :class="subject.status === 'submitted' ? 'submitted' : 'pending'"
@@ -126,7 +127,6 @@
                   {{ subject.status === 'submitted' ? translate('evaluations.evaluated') : translate('evaluations.pending') }}
                 </span>
               </div>
-              <!-- ========== END SUBJECT CARD ========== -->
             </div>
           </div>
         </div>
@@ -159,10 +159,8 @@ const { getSchoolLogo, getSchoolName } = useSchool()
 const { toasts, removeToast } = useToast()
 const { surveys, isLoading, fetchSurveys } = useEvaluations()
 
-// ========== DROPDOWN FILTER ==========
 const selectedRole = ref('all')
 
-// Get all unique evaluator roles from surveys
 const availableRoles = computed(() => {
   const roles = new Set()
   surveys.value.forEach(survey => {
@@ -173,8 +171,13 @@ const availableRoles = computed(() => {
   return Array.from(roles)
 })
 
-// Filter surveys based on selected role
+// Auto-select the first role if only one exists
 const filteredSurveys = computed(() => {
+  // If only one role exists, auto-select it
+  if (availableRoles.value.length === 1 && selectedRole.value === 'all') {
+    selectedRole.value = availableRoles.value[0]
+  }
+  
   if (selectedRole.value === 'all') {
     return surveys.value
   }
@@ -182,7 +185,6 @@ const filteredSurveys = computed(() => {
     survey => survey.evaluator_role === selectedRole.value
   )
 })
-// ========== END DROPDOWN FILTER ==========
 
 const getInitials = (name) => {
   if (!name) return '?'
@@ -201,11 +203,8 @@ const handleLogoError = (event) => {
   event.target.src = '/assets/images/logo2-modified.png'
 }
 
-// ========== PROFILE NAVIGATION (Future) ==========
 const goToProfile = (subjectId) => {
-  // For now, just log it. Future: navigate to profile page
   console.log('🔜 Navigate to profile for subject:', subjectId)
-  // Later: router.push(`/profile/${subjectId}`)
 }
 
 onMounted(async () => {
@@ -340,14 +339,13 @@ onMounted(async () => {
   margin: 0;
 }
 
-/* ========== SURVEYS WRAPPER ========== */
 .surveys-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* ========== DROPDOWN FILTER SECTION ========== */
+/* ========== FILTER SECTION ========== */
 .filter-section {
   display: flex;
   align-items: center;
@@ -400,7 +398,6 @@ onMounted(async () => {
   padding: 8px;
 }
 
-/* ========== SURVEYS LIST ========== */
 .surveys-list {
   display: flex;
   flex-direction: column;
@@ -482,7 +479,6 @@ onMounted(async () => {
   opacity: 0.8;
 }
 
-/* Avatar - Separate click target for future profile */
 .subject-avatar {
   width: 40px;
   height: 40px;
@@ -535,7 +531,20 @@ onMounted(async () => {
   display: block;
 }
 
-/* ========== STATUS BADGE - Visual only, not clickable ========== */
+/* ========== SURVEY TITLE UNDER SUBJECT ========== */
+.subject-survey-title {
+  font-size: 10px;
+  color: #FFC125;
+  display: block;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+  opacity: 0.8;
+}
+
+/* ========== STATUS BADGE ========== */
 .subject-status-badge {
   display: flex;
   align-items: center;
@@ -573,7 +582,6 @@ onMounted(async () => {
   background: #1e3971;
 }
 
-/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .subjects-grid {
     grid-template-columns: 1fr;
@@ -601,6 +609,10 @@ onMounted(async () => {
   .role-dropdown {
     min-width: unset;
   }
+  
+  .subject-survey-title {
+    max-width: 120px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -623,6 +635,11 @@ onMounted(async () => {
 
   .survey-title {
     font-size: 16px;
+  }
+  
+  .subject-survey-title {
+    max-width: 80px;
+    font-size: 9px;
   }
 }
 </style>
