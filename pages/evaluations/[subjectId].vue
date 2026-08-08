@@ -48,9 +48,9 @@
           <h2 class="subject-name">{{ subject.name }}</h2>
           <p class="subject-class">{{ survey.class.name }}</p>
           <p class="subject-role-small">
-            {{ translate('evaluations.role') }}: 
+            {{ translate('evaluations.youAre') }}: 
             <strong>{{ survey.evaluator_role }}</strong>
-            → {{ translate('evaluations.evaluating') }} 
+            → 
             <strong>{{ survey.subject_role }}</strong>
           </p>
         </div>
@@ -104,11 +104,10 @@
         </div>
       </div>
 
-      <!-- ========== SUBMIT BUTTON WITH SINGLE CLICK ========== -->
+      <!-- Submit Button -->
       <div class="submit-section">
         <div class="submit-spacer"></div>
         
-        <!-- Edit button for submitted evaluations -->
         <button 
           v-if="subject?.status === 'submitted' && !isEditing"
           type="button"
@@ -118,7 +117,6 @@
           {{ translate('evaluations.editEvaluation') }}
         </button>
         
-        <!-- Submit/Update button -->
         <button 
           v-else
           type="submit" 
@@ -264,7 +262,6 @@ const submitEvaluation = async () => {
       success(translate('evaluations.saveSuccess'), 3000)
     }
     
-    // Update local subject status to 'submitted'
     subject.value.status = 'submitted'
     isEditing.value = false
     
@@ -282,7 +279,6 @@ const submitEvaluation = async () => {
 const loadData = async () => {
   await fetchSurveys()
   
-  // Find the survey containing this subject
   let found = false
   for (const s of surveys.value) {
     const subj = s.subjects.find(sub => sub.id === subjectId)
@@ -301,7 +297,6 @@ const loadData = async () => {
     return
   }
 
-  // If already submitted, fetch saved answers
   if (subject.value.status === 'submitted') {
     try {
       const saved = await fetchAnswers(surveyId.value, classId.value, subjectId)
@@ -527,7 +522,6 @@ onMounted(loadData)
   margin-top: 8px;
 }
 
-/* ========== SUBMIT SECTION WITH BREATHING ROOM ========== */
 .submit-section {
   margin-top: 50px;
   text-align: center;
@@ -573,7 +567,6 @@ onMounted(loadData)
   transform: scale(0.98);
 }
 
-/* Edit mode button */
 .submit-btn.edit-mode {
   background: #4a6fc1;
   color: white;
@@ -617,7 +610,6 @@ onMounted(loadData)
   cursor: pointer;
 }
 
-/* ========== RESPONSIVE ========== */
 @media (max-width: 480px) {
   .evaluation-form-container {
     padding: 16px;

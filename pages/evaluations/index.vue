@@ -51,7 +51,7 @@
 
       <!-- Surveys with Dropdown -->
       <div v-else class="surveys-wrapper">
-        <!-- ========== DROPDOWN FILTER - HIDE WHEN ONLY 1 ROLE ========== -->
+        <!-- Dropdown Filter - Hide when only 1 role -->
         <div v-if="availableRoles.length > 1" class="filter-section">
           <label class="filter-label">{{ translate('evaluations.filterByRole') }}</label>
           <select v-model="selectedRole" class="role-dropdown">
@@ -139,6 +139,9 @@
         </div>
       </div>
     </main>
+
+    <!-- Bottom Spacer for extra breathing room -->
+    <div class="bottom-spacer"></div>
   </div>
 </template>
 
@@ -171,9 +174,7 @@ const availableRoles = computed(() => {
   return Array.from(roles)
 })
 
-// Auto-select the first role if only one exists
 const filteredSurveys = computed(() => {
-  // If only one role exists, auto-select it
   if (availableRoles.value.length === 1 && selectedRole.value === 'all') {
     selectedRole.value = availableRoles.value[0]
   }
@@ -531,7 +532,6 @@ onMounted(async () => {
   display: block;
 }
 
-/* ========== SURVEY TITLE UNDER SUBJECT ========== */
 .subject-survey-title {
   font-size: 10px;
   color: #FFC125;
@@ -582,6 +582,11 @@ onMounted(async () => {
   background: #1e3971;
 }
 
+/* ========== BOTTOM SPACER FOR BREATHING ROOM ========== */
+.bottom-spacer {
+  height: 80px;
+}
+
 @media (max-width: 768px) {
   .subjects-grid {
     grid-template-columns: 1fr;
@@ -613,6 +618,10 @@ onMounted(async () => {
   .subject-survey-title {
     max-width: 120px;
   }
+
+  .bottom-spacer {
+    height: 60px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -640,6 +649,10 @@ onMounted(async () => {
   .subject-survey-title {
     max-width: 80px;
     font-size: 9px;
+  }
+
+  .bottom-spacer {
+    height: 50px;
   }
 }
 </style>
