@@ -6,7 +6,7 @@ export class ApiService {
   constructor() {
     this.baseURL = null
     this.token = null
-    
+
     if (process.client) {
       this.token = localStorage.getItem('auth_token')
       this.updateBaseURLFromStorage()
@@ -20,7 +20,7 @@ export class ApiService {
   updateBaseURLFromStorage() {
     if (process.client) {
       const savedSchool = localStorage.getItem('selected_school')
-      
+
       if (savedSchool && SCHOOLS[savedSchool]) {
         this.baseURL = SCHOOLS[savedSchool].apiBaseURL
         console.log(` API Service baseURL set to: ${this.baseURL} for school: ${savedSchool}`)
@@ -37,17 +37,17 @@ export class ApiService {
       if (SCHOOLS[schoolId]) {
         const newBaseURL = SCHOOLS[schoolId].apiBaseURL
         const oldBaseURL = this.baseURL
-        
+
         this.baseURL = newBaseURL
         console.log(` API Service manually set to: ${schoolId}, URL: ${this.baseURL}`)
-        
+
         // CRITICAL: If school changed AND we have a token, clear it
         // because tokens are school-specific
         if (oldBaseURL && oldBaseURL !== newBaseURL && this.token) {
           console.log(`⚠️ School changed from ${oldBaseURL} to ${newBaseURL}, clearing token`)
           this.clearToken()
         }
-        
+
         return true
       }
     }
@@ -123,7 +123,14 @@ export class ApiService {
           };
         }
 
-        throw new Error(errorData.message || `HTTP ${response.status}`);
+        // Preserve status + validation errors so callers can map 422 errors
+        // to individual fields (e.g. "address.sub_city", "choices.1").
+        // Existing callers that only read `.message` keep working unchanged.
+        const err = new Error(errorData.message || `HTTP ${response.status}`);
+        err.status = response.status;
+        err.errors = errorData.errors || null;
+        err.body = errorData;
+        throw err;
       }
 
       const data = await response.json();
@@ -164,11 +171,11 @@ export class ApiService {
 
     return this.request(endpoint);
   }
-  
+
   async getClassSchedules(classId) {
     return this.request(`/api/v1/student/classes/${classId}`);
   }
-  
+
   async getAttendanceRecords(filters = {}) {
     const params = new URLSearchParams();
 
@@ -224,7 +231,7 @@ export class ApiService {
   }
 
   // ========== NEW: EVALUATIONS METHODS ==========
-  
+
   /**
    * Get all open surveys for the logged-in user
    * GET /api/v1/surveys
