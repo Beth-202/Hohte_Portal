@@ -13,6 +13,7 @@ export class NavigationService {
         path: "/permission/status",
         name: "permission-status",
       },
+      profile: { path: "/profile", name: "profile" },
       // ========== NEW: EVALUATIONS ROUTES ==========
       evaluations: {
         path: "/evaluations",
@@ -52,6 +53,8 @@ export class NavigationService {
       "/courses/*": "courses",
       "/permission/request": "permission",
       "/permission/status": "status",
+      "/profile": "profile",
+      "/profile/*": "profile",
       "/evaluations": "evaluations",
       "/evaluations/*": "evaluations",
       "/messages": "messages",
@@ -95,6 +98,10 @@ export class NavigationService {
 
   goToPermissionStatus(router) {
     this.navigate(router, "permissionStatus");
+  }
+
+  goToProfile(router) {
+    this.navigate(router, "profile");
   }
 
   // ========== NEW: EVALUATIONS NAVIGATION ==========

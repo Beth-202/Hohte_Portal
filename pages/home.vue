@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>
-      <p class="loading-text">{{ t('common.loading') }}</p>
+      <p class="loading-text">{{ t("common.loading") }}</p>
     </div>
 
     <div v-else-if="error" class="error-state">
@@ -18,21 +18,33 @@
       <header class="header-section">
         <div class="language-toggle" @click="toggleLanguage">
           <svg class="globe-icon" viewBox="0 0 24 24" width="24" height="24">
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM4.09 13H8.38C8.84 14.88 9.77 16.56 11 17.89C9.64 17.75 8.35 17.07 7.2 16.03L4.09 13ZM12 20C10.74 20 9.53 19.52 8.56 18.73C9.88 18.59 11.19 18.11 12 17.39C12.81 18.11 14.12 18.59 15.44 18.73C14.47 19.52 13.26 20 12 20ZM20 12C20 11.66 19.95 11.32 19.86 11H15.62C15.16 9.12 14.23 7.44 13 6.11C14.36 6.25 15.65 6.93 16.8 7.97L19.91 11C19.97 11.33 20 11.66 20 12ZM12 4C13.26 4 14.47 4.48 15.44 5.27C14.12 5.41 12.81 5.89 12 6.61C11.19 5.89 9.88 5.41 8.56 5.27C9.53 4.48 10.74 4 12 4ZM4.09 11L7.2 7.97C8.35 6.93 9.64 6.25 11 6.11C9.77 7.44 8.84 9.12 8.38 11H4.09Z"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM4.09 13H8.38C8.84 14.88 9.77 16.56 11 17.89C9.64 17.75 8.35 17.07 7.2 16.03L4.09 13ZM12 20C10.74 20 9.53 19.52 8.56 18.73C9.88 18.59 11.19 18.11 12 17.39C12.81 18.11 14.12 18.59 15.44 18.73C14.47 19.52 13.26 20 12 20ZM20 12C20 11.66 19.95 11.32 19.86 11H15.62C15.16 9.12 14.23 7.44 13 6.11C14.36 6.25 15.65 6.93 16.8 7.97L19.91 11C19.97 11.33 20 11.66 20 12ZM12 4C13.26 4 14.47 4.48 15.44 5.27C14.12 5.41 12.81 5.89 12 6.61C11.19 5.89 9.88 5.41 8.56 5.27C9.53 4.48 10.74 4 12 4ZM4.09 11L7.2 7.97C8.35 6.93 9.64 6.25 11 6.11C9.77 7.44 8.84 9.12 8.38 11H4.09Z"
+            />
           </svg>
-          <span class="language-label">{{ locale === 'en' ? 'አማ' : 'EN' }}</span>
+          <span class="language-label">{{
+            locale === "en" ? "አማ" : "EN"
+          }}</span>
         </div>
 
         <div class="welcome-text">
-          <p class="welcome-label">{{ t('home.welcome') }}</p>
-          <h1 class="welcome-name">{{ student?.fullName || student?.name || 'Student' }}</h1>
+          <p class="welcome-label">{{ t("home.welcome") }}</p>
+          <h1 class="welcome-name">
+            {{ student?.fullName || student?.name || "Student" }}
+          </h1>
         </div>
 
-        <div class="profile-image-container">
-          <img 
-            :src="getStudentProfileImage()" 
-            :alt="student?.fullName" 
-            class="profile-image" 
+        <div
+          class="profile-image-container"
+          @click="goToProfile"
+          role="button"
+          tabindex="0"
+          aria-label="Open profile"
+        >
+          <img
+            :src="getStudentProfileImage()"
+            :alt="student?.fullName"
+            class="profile-image"
             @error="handleImageError"
             loading="lazy"
           />
@@ -44,41 +56,81 @@
         <div class="alert-content">
           <span class="alert-icon">
             <svg viewBox="0 0 24 24" width="20" height="20">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"/>
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
+              />
             </svg>
           </span>
           <span class="alert-message">
-            <strong>{{ pendingRequestsCount }} {{ t('home.pendingRequests') }}</strong>
+            <strong
+              >{{ pendingRequestsCount }}
+              {{ t("home.pendingRequests") }}</strong
+            >
           </span>
         </div>
         <span class="alert-arrow">
           <svg viewBox="0 0 24 24" width="18" height="18">
-            <path d="M9 18L15 12L9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M9 18L15 12L9 6"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </span>
       </div>
 
       <!-- ========== QUICK ACTION SECTION WITH BREATHING ROOM ========== -->
       <div class="quick-action-section">
-        <p class="quick-action-label">{{ t('home.quickAction') }}</p>
+        <p class="quick-action-label">{{ t("home.quickAction") }}</p>
         <div class="evaluation-card" @click="goToEvaluations">
           <div class="evaluation-card-content">
             <div class="evaluation-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" opacity="0.3"/>
-                <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
-                <path d="M11 12L13 14M13 12L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path
+                  d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                  fill="currentColor"
+                  opacity="0.3"
+                />
+                <rect
+                  x="9"
+                  y="9"
+                  width="6"
+                  height="6"
+                  rx="1"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M11 12L13 14M13 12L11 14"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
               </svg>
             </div>
             <div class="evaluation-text">
-              <span class="evaluation-title">{{ t('home.evaluations') }}</span>
-              <span class="evaluation-subtitle">{{ t('home.evaluationsSubtitle') }}</span>
+              <span class="evaluation-title">{{ t("home.evaluations") }}</span>
+              <span class="evaluation-subtitle">{{
+                t("home.evaluationsSubtitle")
+              }}</span>
             </div>
           </div>
           <span class="evaluation-arrow">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </span>
         </div>
@@ -86,18 +138,18 @@
       <!-- ========== END QUICK ACTION SECTION ========== -->
 
       <section class="courses-section">
-        <h2 class="section-title">{{ t('home.myCourses') }}</h2>
+        <h2 class="section-title">{{ t("home.myCourses") }}</h2>
         <div class="course-list">
           <div
             v-for="course in courses"
             :key="course.id"
             class="course-card"
-            :class="{ 'expanded': expandedSchedules[course.id] }"
+            :class="{ expanded: expandedSchedules[course.id] }"
             @click="goToCourseDetail(course.id)"
           >
-            <img 
-              :src="getClassImage()" 
-              alt="Course background" 
+            <img
+              :src="getClassImage()"
+              alt="Course background"
               class="course-bg"
               loading="lazy"
               @error="handleImageError"
@@ -106,64 +158,84 @@
             <div class="course-content">
               <div class="course-header">
                 <h3 class="course-title">{{ course.name }}</h3>
-                <div 
-                  v-if="hasManySchedules(course.schedule)" 
+                <div
+                  v-if="hasManySchedules(course.schedule)"
                   class="expand-indicator"
-                  :class="{ 'expanded': expandedSchedules[course.id] }"
+                  :class="{ expanded: expandedSchedules[course.id] }"
                   @click="toggleSchedule(course.id, $event)"
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                    <path d="M7 10l5 5 5-5z" fill="currentColor" />
                   </svg>
                 </div>
               </div>
-              
+
               <div class="course-schedule-section">
                 <div class="time-icon">🕒</div>
                 <div class="schedule-container">
-                  <div v-if="formatScheduleByDay(course.schedule).length === 0" class="no-schedule-text">
+                  <div
+                    v-if="formatScheduleByDay(course.schedule).length === 0"
+                    class="no-schedule-text"
+                  >
                     No schedule available
                   </div>
                   <div v-else class="schedule-display">
                     <div class="schedule-pills">
                       <template v-if="!expandedSchedules[course.id]">
-                        <div 
-                          v-for="(item, index) in formatScheduleByDay(course.schedule).slice(0, 2)"
+                        <div
+                          v-for="(item, index) in formatScheduleByDay(
+                            course.schedule,
+                          ).slice(0, 2)"
                           :key="index"
                           class="schedule-pill"
                           :title="item.full"
                         >
                           <span class="day-abbr">{{ item.dayAbbr }}</span>
-                          <span class="day-time" v-if="item.time">{{ item.time }}</span>
+                          <span class="day-time" v-if="item.time">{{
+                            item.time
+                          }}</span>
                         </div>
-                        
-                        <div 
-                          v-if="formatScheduleByDay(course.schedule).length > 2" 
+
+                        <div
+                          v-if="formatScheduleByDay(course.schedule).length > 2"
                           class="more-pill"
                           @click="toggleSchedule(course.id, $event)"
                         >
-                          <span class="more-text">+{{ formatScheduleByDay(course.schedule).length - 2 }}</span>
+                          <span class="more-text"
+                            >+{{
+                              formatScheduleByDay(course.schedule).length - 2
+                            }}</span
+                          >
                         </div>
                       </template>
-                      
+
                       <template v-if="expandedSchedules[course.id]">
-                        <div 
-                          v-for="(item, index) in formatScheduleByDay(course.schedule)"
+                        <div
+                          v-for="(item, index) in formatScheduleByDay(
+                            course.schedule,
+                          )"
                           :key="index"
                           class="schedule-pill"
                           :title="item.full"
                         >
                           <span class="day-abbr">{{ item.dayAbbr }}</span>
-                          <span class="day-time" v-if="item.time">{{ item.time }}</span>
+                          <span class="day-time" v-if="item.time">{{
+                            item.time
+                          }}</span>
                         </div>
                       </template>
                     </div>
-                    
-                    <div v-if="expandedSchedules[course.id]" class="expanded-details">
+
+                    <div
+                      v-if="expandedSchedules[course.id]"
+                      class="expanded-details"
+                    >
                       <div class="expanded-title">Full Schedule:</div>
                       <div class="expanded-items">
-                        <div 
-                          v-for="(item, index) in formatScheduleByDay(course.schedule)" 
+                        <div
+                          v-for="(item, index) in formatScheduleByDay(
+                            course.schedule,
+                          )"
                           :key="index"
                           class="expanded-item"
                         >
@@ -181,29 +253,36 @@
       </section>
 
       <section class="attendance-section">
-        <h2 class="section-title">{{ t('home.overallAttendance') }}</h2>
+        <h2 class="section-title">{{ t("home.overallAttendance") }}</h2>
         <div class="attendance-container">
           <div class="attendance-details">
             <div
               class="attendance-chart"
               :style="{
-                background: `conic-gradient(#FFC125 ${(attendance?.percentage || 0) * 3.6}deg, #3C414D 0deg)`
+                background: `conic-gradient(#FFC125 ${(attendance?.percentage || 0) * 3.6}deg, #3C414D 0deg)`,
               }"
             >
               <div class="chart-inner-circle">
-                <span class="attendance-percentage">{{ attendance?.percentage || 0 }}%</span>
+                <span class="attendance-percentage"
+                  >{{ attendance?.percentage || 0 }}%</span
+                >
               </div>
             </div>
             <div class="attendance-info">
               <p class="status-label">
-                {{ t('home.status') }}:
-                <span class="status-value" :class="attendance?.status || 'good'">
-                  {{ t(`home.${attendance?.status || 'good'}`) }}
+                {{ t("home.status") }}:
+                <span
+                  class="status-value"
+                  :class="attendance?.status || 'good'"
+                >
+                  {{ t(`home.${attendance?.status || "good"}`) }}
                 </span>
               </p>
               <p class="total-label">
-                {{ t('home.totalPercentage') }}:
-                <span class="total-value">{{ attendance?.percentage || 0 }}%</span>
+                {{ t("home.totalPercentage") }}:
+                <span class="total-value"
+                  >{{ attendance?.percentage || 0 }}%</span
+                >
               </p>
             </div>
           </div>
@@ -216,178 +295,198 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import { useRouter } from '#app'
-import { useLanguage } from '~/composables/useLanguage'
-import { useNavigation } from '~/composables/useNavigation'
-import { useStudentData } from '~/composables/useStudentData'
-import { useSchool } from '~/composables/useSchool'
+import { onMounted, ref, watch } from "vue";
+import { useRouter } from "#app";
+import { useLanguage } from "~/composables/useLanguage";
+import { useNavigation } from "~/composables/useNavigation";
+import { useStudentData } from "~/composables/useStudentData";
+import { useSchool } from "~/composables/useSchool";
 
-import classImage from '~/assets/images/class_image.png'
+import classImage from "~/assets/images/class_image.png";
 
-const router = useRouter()
-const { t, setLocale, locale } = useLanguage()
-const { goToPermissionStatus, goToCourseDetail } = useNavigation()
-const { student, courses, attendance, pendingRequestsCount, initializeData, isLoading, error } = useStudentData()
-const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool()
+const router = useRouter();
+const { t, setLocale, locale } = useLanguage();
+const { goToPermissionStatus, goToCourseDetail, goToProfile } = useNavigation()
+const {
+  student,
+  courses,
+  attendance,
+  pendingRequestsCount,
+  initializeData,
+  isLoading,
+  error,
+} = useStudentData();
+const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool();
 
-const expandedSchedules = ref({})
+const expandedSchedules = ref({});
 
 const toggleLanguage = () => {
-  const newLocale = locale.value === 'en' ? 'am' : 'en'
-  setLocale(newLocale) 
-}
+  const newLocale = locale.value === "en" ? "am" : "en";
+  setLocale(newLocale);
+};
 
 const toggleSchedule = (courseId, event) => {
-  event.stopPropagation() 
-  expandedSchedules.value[courseId] = !expandedSchedules.value[courseId]
-}
+  event.stopPropagation();
+  expandedSchedules.value[courseId] = !expandedSchedules.value[courseId];
+};
 
 const goToEvaluations = () => {
-  router.push('/evaluations')
-}
+  router.push("/evaluations");
+};
 
 const formatScheduleByDay = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') {
-    return []
+  if (
+    !scheduleText ||
+    scheduleText === "No schedule information" ||
+    scheduleText === "No schedule available"
+  ) {
+    return [];
   }
-  
-  const scheduleItems = scheduleText.split(',').map(item => {
-    const trimmed = item.trim()
-    
-    let dayAbbr = ''
-    let time = ''
-    
-    if (trimmed.includes('Monday')) {
-      dayAbbr = 'Mon'
-      time = trimmed.replace('Monday', '').trim()
-    } else if (trimmed.includes('Tuesday')) {
-      dayAbbr = 'Tue'
-      time = trimmed.replace('Tuesday', '').trim()
-    } else if (trimmed.includes('Wednesday')) {
-      dayAbbr = 'Wed'
-      time = trimmed.replace('Wednesday', '').trim()
-    } else if (trimmed.includes('Thursday')) {
-      dayAbbr = 'Thu'
-      time = trimmed.replace('Thursday', '').trim()
-    } else if (trimmed.includes('Friday')) {
-      dayAbbr = 'Fri'
-      time = trimmed.replace('Friday', '').trim()
-    } else if (trimmed.includes('Saturday')) {
-      dayAbbr = 'Sat'
-      time = trimmed.replace('Saturday', '').trim()
-    } else if (trimmed.includes('Sunday')) {
-      dayAbbr = 'Sun'
-      time = trimmed.replace('Sunday', '').trim()
+
+  const scheduleItems = scheduleText.split(",").map((item) => {
+    const trimmed = item.trim();
+
+    let dayAbbr = "";
+    let time = "";
+
+    if (trimmed.includes("Monday")) {
+      dayAbbr = "Mon";
+      time = trimmed.replace("Monday", "").trim();
+    } else if (trimmed.includes("Tuesday")) {
+      dayAbbr = "Tue";
+      time = trimmed.replace("Tuesday", "").trim();
+    } else if (trimmed.includes("Wednesday")) {
+      dayAbbr = "Wed";
+      time = trimmed.replace("Wednesday", "").trim();
+    } else if (trimmed.includes("Thursday")) {
+      dayAbbr = "Thu";
+      time = trimmed.replace("Thursday", "").trim();
+    } else if (trimmed.includes("Friday")) {
+      dayAbbr = "Fri";
+      time = trimmed.replace("Friday", "").trim();
+    } else if (trimmed.includes("Saturday")) {
+      dayAbbr = "Sat";
+      time = trimmed.replace("Saturday", "").trim();
+    } else if (trimmed.includes("Sunday")) {
+      dayAbbr = "Sun";
+      time = trimmed.replace("Sunday", "").trim();
     } else {
-      dayAbbr = trimmed.substring(0, 3)
-      time = trimmed.substring(3).trim()
+      dayAbbr = trimmed.substring(0, 3);
+      time = trimmed.substring(3).trim();
     }
-    
-    return { 
-      dayAbbr, 
-      time, 
+
+    return {
+      dayAbbr,
+      time,
       full: trimmed,
-      dayFull: getFullDayName(trimmed)
-    }
-  })
-  
-  return scheduleItems
-}
+      dayFull: getFullDayName(trimmed),
+    };
+  });
+
+  return scheduleItems;
+};
 
 const getFullDayName = (scheduleText) => {
-  if (scheduleText.includes('Monday')) return 'Monday'
-  if (scheduleText.includes('Tuesday')) return 'Tuesday'
-  if (scheduleText.includes('Wednesday')) return 'Wednesday'
-  if (scheduleText.includes('Thursday')) return 'Thursday'
-  if (scheduleText.includes('Friday')) return 'Friday'
-  if (scheduleText.includes('Saturday')) return 'Saturday'
-  if (scheduleText.includes('Sunday')) return 'Sunday'
-  return scheduleText
-}
+  if (scheduleText.includes("Monday")) return "Monday";
+  if (scheduleText.includes("Tuesday")) return "Tuesday";
+  if (scheduleText.includes("Wednesday")) return "Wednesday";
+  if (scheduleText.includes("Thursday")) return "Thursday";
+  if (scheduleText.includes("Friday")) return "Friday";
+  if (scheduleText.includes("Saturday")) return "Saturday";
+  if (scheduleText.includes("Sunday")) return "Sunday";
+  return scheduleText;
+};
 
 const hasManySchedules = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return false
-  return scheduleText.split(',').length > 2
-}
+  if (
+    !scheduleText ||
+    scheduleText === "No schedule information" ||
+    scheduleText === "No schedule available"
+  )
+    return false;
+  return scheduleText.split(",").length > 2;
+};
 
 const getScheduleCount = (scheduleText) => {
-  if (!scheduleText || scheduleText === 'No schedule information' || scheduleText === 'No schedule available') return 0
-  return scheduleText.split(',').length
-}
+  if (
+    !scheduleText ||
+    scheduleText === "No schedule information" ||
+    scheduleText === "No schedule available"
+  )
+    return 0;
+  return scheduleText.split(",").length;
+};
 
 const handleImageError = (event) => {
-  console.error('Image failed to load:', event.target.src);
-  
-  if (event.target.classList.contains('profile-image')) {
+  console.error("Image failed to load:", event.target.src);
+
+  if (event.target.classList.contains("profile-image")) {
     event.target.src = getPlaceholderProfile();
-    console.log('Falling back to placeholder for profile image');
-  } else if (event.target.classList.contains('course-bg')) {
+    console.log("Falling back to placeholder for profile image");
+  } else if (event.target.classList.contains("course-bg")) {
     event.target.src = classImage;
-    console.log('Retrying course background image with imported path');
-  } else if (event.target.classList.contains('logo-image')) {
-    event.target.src = '/assets/images/logo2-modified.png';
-    console.log('Falling back to default logo');
+    console.log("Retrying course background image with imported path");
+  } else if (event.target.classList.contains("logo-image")) {
+    event.target.src = "/assets/images/logo2-modified.png";
+    console.log("Falling back to default logo");
   }
-}
+};
 
 const getPlaceholderProfile = () => {
-  return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiMyQjRCODMiLz48cGF0aCBkPSJNNTAgNTVDNjAuMzU1MyA1NSA2OC44NzUgNDYuNDgwMiA2OC44NzUgMzYuMTI1QzY4Ljg3NSAyNS43Njk4IDYwLjM1NTMgMTcuMjUgNTAgMTcuMjVDMzkuNjQ0NyAxNy4yNSAzMS4xMjUgMjUuNzY5OCAzMS4xMjUgMzYuMTI1QzMxLjEyNSA0Ni40ODAyIDM5LjY0NDcgNTUgNTAgNTVaIiBmaWxsPSIjRkZGMDAwIi8+PHBhdGggZD0iTTUwIDYwQzMyLjg3NSA2MCAxOC43NSA3NC4xMjUgMTguNzUgOTEuMjVWOTJINzIuNVY5MS4yNUM3Mi41IDc0LjEyNSA1OC4zNzUgNjAgNTEuMjUgNjBINTBaIiBmaWxsPSIjRkZGMDAwIi8+PC9zdmc+';
-}
+  return "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiMyQjRCODMiLz48cGF0aCBkPSJNNTAgNTVDNjAuMzU1MyA1NSA2OC44NzUgNDYuNDgwMiA2OC44NzUgMzYuMTI1QzY4Ljg3NSAyNS43Njk4IDYwLjM1NTMgMTcuMjUgNTAgMTcuMjVDMzkuNjQ0NyAxNy4yNSAzMS4xMjUgMjUuNzY5OCAzMS4xMjUgMzYuMTI1QzMxLjEyNSA0Ni40ODAyIDM5LjY0NDcgNTUgNTAgNTVaIiBmaWxsPSIjRkZGMDAwIi8+PHBhdGggZD0iTTUwIDYwQzMyLjg3NSA2MCAxOC43NSA3NC4xMjUgMTguNzUgOTEuMjVWOTJINzIuNVY5MS4yNUM3Mi41IDc0LjEyNSA1OC4zNzUgNjAgNTEuMjUgNjBINTBaIiBmaWxsPSIjRkZGMDAwIi8+PC9zdmc+";
+};
 
 const getClassImage = () => {
   return classImage;
-}
+};
 
 const getStudentProfileImage = () => {
   if (student.value && student.value.profileImage) {
     const profileUrl = student.value.profileImage;
-    if (profileUrl && (profileUrl.startsWith('http://') || profileUrl.startsWith('https://'))) {
-      console.log('Using ERP profile image:', profileUrl);
+    if (
+      profileUrl &&
+      (profileUrl.startsWith("http://") || profileUrl.startsWith("https://"))
+    ) {
+      console.log("Using ERP profile image:", profileUrl);
       return profileUrl;
     }
   }
-  
+
   if (student.value && student.value.raw && student.value.raw.photo_url) {
     const photoUrl = student.value.raw.photo_url;
-    if (photoUrl && (photoUrl.startsWith('http://') || photoUrl.startsWith('https://'))) {
-      console.log('Using photo_url from API:', photoUrl);
+    if (
+      photoUrl &&
+      (photoUrl.startsWith("http://") || photoUrl.startsWith("https://"))
+    ) {
+      console.log("Using photo_url from API:", photoUrl);
       return photoUrl;
     }
   }
-  
-  console.log('Using placeholder profile image');
+
+  console.log("Using placeholder profile image");
   return getPlaceholderProfile();
-}
+};
 
 onMounted(async () => {
   try {
-    console.log(' Home page mounted')
-    console.log('Initial student data:', student.value)
-    console.log('Initial courses:', courses.value)
-    await initializeData()
-    console.log('After initialize - student:', student.value)
-    console.log('After initialize - courses:', courses.value)
+    console.log(" Home page mounted");
+    console.log("Initial student data:", student.value);
+    console.log("Initial courses:", courses.value);
+    await initializeData();
+    console.log("After initialize - student:", student.value);
+    console.log("After initialize - courses:", courses.value);
   } catch (err) {
-    console.error('Failed to initialize data:', err)
+    console.error("Failed to initialize data:", err);
   }
-})
+});
 
-watch(courses, (newCourses) => {
-  console.log('Courses updated:', newCourses.length)
-}, { immediate: true })
-
-// TEMP Phase-1 verification — remove after checking
-if (process.client) {
-  window.__testMemberProfile = async () => {
-    const p = useMemberProfile()
-    await p.loadProfile()
-    console.table(p.profile.value)
-    await p.loadOptions()
-    console.log('OPTION KEYS:', Object.keys(p.options.value || {}))
-    return p
-  }
-}
+watch(
+  courses,
+  (newCourses) => {
+    console.log("Courses updated:", newCourses.length);
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>
@@ -395,7 +494,11 @@ if (process.client) {
   min-height: 100vh;
   background: linear-gradient(135deg, #1e3971 0%, #0d1f40 100%);
   color: #fff;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   display: flex;
   flex-direction: column;
 }
@@ -481,8 +584,15 @@ if (process.client) {
   box-shadow: 0 4px 15px rgba(255, 193, 37, 0.3);
   flex-shrink: 0;
   z-index: 2;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
-
+.profile-image-container:hover {
+  transform: scale(1.05);
+}
+.profile-image-container:active {
+  transform: scale(0.96);
+}
 .profile-image {
   width: 100%;
   height: 100%;
@@ -547,7 +657,7 @@ if (process.client) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #FFC125 0%, #f5a623 100%);
+  background: linear-gradient(135deg, #ffc125 0%, #f5a623 100%);
   border-radius: 16px;
   padding: 16px 20px;
   cursor: pointer;
@@ -560,19 +670,24 @@ if (process.client) {
 
 /* Glow effect */
 .evaluation-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
   animation: glowPulse 3s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes glowPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(1);
   }
@@ -701,7 +816,11 @@ if (process.client) {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
   backdrop-filter: brightness(0.7) contrast(1.2);
   z-index: 1;
 }
@@ -727,7 +846,7 @@ if (process.client) {
   font-size: 22px;
   font-weight: 700;
   color: #fff;
-  margin-top:5px;
+  margin-top: 5px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   flex: 1;
   padding-right: 10px;
@@ -779,7 +898,7 @@ if (process.client) {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-  margin-top:22px;
+  margin-top: 22px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
@@ -802,7 +921,7 @@ if (process.client) {
   background: rgba(255, 255, 255, 0.15);
   padding: 6px 10px;
   border-radius: 8px;
-  margin-top:15px;
+  margin-top: 15px;
   min-width: 50px;
   cursor: default;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -836,7 +955,7 @@ if (process.client) {
   justify-content: center;
   background: rgba(255, 193, 37, 0.2);
   padding: 6px 12px;
-  margin-top:15px;
+  margin-top: 15px;
   border-radius: 8px;
   min-width: 40px;
   cursor: pointer;
@@ -865,8 +984,14 @@ if (process.client) {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .expanded-title {
@@ -1005,9 +1130,9 @@ if (process.client) {
   .course-card {
     min-height: 140px;
   }
-  
+
   .course-card.expanded {
-    min-height: auto; 
+    min-height: auto;
     height: auto;
   }
 
@@ -1116,13 +1241,15 @@ if (process.client) {
   width: 50px;
   height: 50px;
   border: 4px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #FFC125;
+  border-top-color: #ffc125;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {

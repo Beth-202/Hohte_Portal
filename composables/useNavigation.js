@@ -23,6 +23,8 @@ export const useNavigation = () => {
       activeNav.value = "status";
     } else if (path === "/evaluations" || path.startsWith("/evaluations/")) {
       activeNav.value = "evaluations";
+    } else if (path === "/profile" || path.startsWith("/profile/")) {
+      activeNav.value = "profile";
     } else if (path === "/messages") {
       activeNav.value = "messages";
     } else if (path === "/alerts") {
@@ -61,9 +63,10 @@ export const useNavigation = () => {
   const goToCourseDetail = (courseId) => navigateTo(`/courses/${courseId}`);
   const goToPermissionRequest = () => navigateTo("/permission/request");
   const goToPermissionStatus = () => navigateTo("/permission/status");
+  const goToProfile = () => navigateTo("/profile");
   const goToMessages = () => navigateTo("/messages");
   const goToAlerts = () => navigateTo("/alerts");
-  
+
   // ========== NEW: EVALUATION NAVIGATION ==========
   const goToEvaluations = () => navigateTo("/evaluations");
   const goToEvaluation = (surveyId, classId, subjectId) => {
@@ -82,6 +85,7 @@ export const useNavigation = () => {
     goToCourseDetail,
     goToPermissionRequest,
     goToPermissionStatus,
+    goToProfile,
     goToMessages,
     goToAlerts,
     goToEvaluations,

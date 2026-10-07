@@ -209,5 +209,124 @@
         "cancel": "Cancel"
       
 
+  },
+  "profile": {
+  "title": "My Profile",
+  "subtitle": "Keep your information up to date",
+  "loading": "Loading your profile...",
+  "retry": "Retry",
+  "loadError": "Could not load your profile. Please try again.",
+  "saveError": "Could not save. Please check the fields below.",
+  "networkError": "Network error. Please check your connection.",
+  "sessionExpired": "Your session expired. Please reopen the app.",
+  "savedSuccess": "Saved successfully.",
+  "savedPending": "Saved. Your change is waiting for approval.",
+  "confirmSuccess": "Thank you. Your profile is confirmed.",
+  "confirmError": "Could not confirm your profile. Please try again.",
+  "save": "Save",
+  "saving": "Saving...",
+  "expand": "Expand",
+  "collapse": "Collapse",
+  "notSet": "Not set",
+  "optional": "Optional",
+  "required": "Required",
+  "otherPlaceholder": "Type your answer",
+  "chooseOption": "Choose...",
+  "searchOptions": "Search...",
+  "noOptionsFound": "No matches found",
+  "addOther": "Add another",
+  "removeOther": "Remove",
+  "maxOthersReached": "You can add up to {max} entries.",
+  "pendingApproval": "Waiting for approval",
+  "pendingNewValue": "New: {value}",
+  "rejectedReason": "Rejected: {note}",
+  "importedBannerTitle": "Please check your information",
+  "importedBannerText": "The office filled in some details for you. Check them and correct anything that is wrong.",
+  "importedBannerConfirm": "Looks right",
+  "importedBannerEdit": "Edit",
+  "importedOfficeNote": "Office previously recorded: {value}",
+  "departmentsReadOnly": "Your service departments are managed by the office. To request a change, use the department change request.",
+  "changeRequestsTitle": "My change requests",
+  "changeRequestsEmpty": "You have no pending or reviewed changes yet.",
+  "changeRequestsField": "Field",
+  "changeRequestsOldValue": "Old value",
+  "changeRequestsNewValue": "New value",
+  "changeRequestsStatus": "Status",
+  "changeRequestsRequestedAt": "Requested",
+  "changeRequestsReviewedAt": "Reviewed",
+  "changeRequestsNote": "Note",
+  "statusPending": "Pending",
+  "statusApproved": "Approved",
+  "statusRejected": "Rejected",
+  "sections": {
+    "personal": "Personal",
+    "address": "Address",
+    "education": "Education",
+    "spiritual_education": "Spiritual education",
+    "work": "Work",
+    "skills": "Skills & availability",
+    "departments": "Current departments"
+  },
+  "summary": {
+    "empty": "Not filled in yet",
+    "personalMissing": "Not filled in yet"
+  },
+  "personal": {
+    "firstName": "First name",
+    "middleName": "Middle name",
+    "lastName": "Last name",
+    "phoneNumber": "Phone number",
+    "baptismalName": "Baptismal name",
+    "motherName": "Mother's name",
+    "birthDate": "Date of birth",
+    "sex": "Sex",
+    "male": "Male",
+    "female": "Female",
+    "phoneHint": "Ethiopian mobile, e.g. 0911234567",
+    "phoneInvalid": "Please enter a valid Ethiopian mobile number.",
+    "firstNameRequired": "First name is required."
+  },
+  "address": {
+    "country": "Country",
+    "city": "City",
+    "cityOther": "City (type your own)",
+    "subCity": "Sub-city",
+    "subCityOther": "Sub-city (type your own)",
+    "woreda": "Woreda",
+    "area": "Area / neighborhood",
+    "houseNumber": "House number",
+    "region": "Region / state",
+    "zipCode": "ZIP / postal code",
+    "addressLine": "Address line",
+    "subCityRequired": "Please choose a sub-city (or type your own).",
+    "ethiopia": "Ethiopia"
+  },
+  "education": {
+    "level": "Level",
+    "field": "Field of study",
+    "fieldOther": "Field (type your own)",
+    "school": "School",
+    "schoolOther": "School (type your own)"
+  },
+  "spiritualEducation": {
+    "items": "Completed courses",
+    "other": "Other (type your own)",
+    "otherHint": "Add anything that is not in the list (up to 10)."
+  },
+  "work": {
+    "occupationStatus": "Occupation status",
+    "jobTitle": "Job title",
+    "occupationRequired": "Please choose an occupation status."
+  },
+  "skills": {
+    "items": "Skills and talents",
+    "other": "Other skills (type your own)",
+    "availability": "Availability",
+    "serviceNote": "How would you like to serve?",
+    "serviceNotePlaceholder": "Tell us anything that helps us place you well."
+  },
+  "months": {
+    "long": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   }
+}
 }
