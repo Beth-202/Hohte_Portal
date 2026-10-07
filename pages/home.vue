@@ -36,19 +36,19 @@
 
         <div
           class="profile-image-container"
-          @click="goToProfile"
-          @keydown.enter="goToProfile"
-          @keydown.space.prevent="goToProfile"
+          @click="openProfile"
+          @pointerup="openProfile"
           role="button"
           tabindex="0"
           aria-label="Open profile"
         >
           <img
-            :src="getStudentProfileImage()"
+            :src="profileImageSrc"
             :alt="student?.fullName"
             class="profile-image"
             @error="handleImageError"
             loading="lazy"
+            draggable="false"
           />
         </div>
       </header>
@@ -297,7 +297,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useRouter } from "#app";
 import { useLanguage } from "~/composables/useLanguage";
 import { useNavigation } from "~/composables/useNavigation";
@@ -321,6 +321,30 @@ const {
 const { getSchoolLogo, getSchoolName, currentSchoolId } = useSchool();
 
 const expandedSchedules = ref({});
+
+// ---- Avatar click: debounce so @click + @pointerup don't double-fire ----
+let lastOpenAt = 0;
+const openProfile = () => {
+  const now = Date.now();
+  if (now - lastOpenAt < 400) return;
+  lastOpenAt = now;
+  console.log("[avatar] opening profile");
+  goToProfile();
+};
+
+// ---- Stable image source (recomputed only when student changes) ----
+const profileImageSrc = computed(() => {
+  const s = student.value;
+  if (!s) return getPlaceholderProfile();
+
+  const candidates = [s.profileImage, s.raw?.photo_url];
+  for (const url of candidates) {
+    if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+      return url;
+    }
+  }
+  return getPlaceholderProfile();
+});
 
 const toggleLanguage = () => {
   const newLocale = locale.value === "en" ? "am" : "en";
@@ -440,33 +464,6 @@ const getPlaceholderProfile = () => {
 
 const getClassImage = () => {
   return classImage;
-};
-
-const getStudentProfileImage = () => {
-  if (student.value && student.value.profileImage) {
-    const profileUrl = student.value.profileImage;
-    if (
-      profileUrl &&
-      (profileUrl.startsWith("http://") || profileUrl.startsWith("https://"))
-    ) {
-      console.log("Using ERP profile image:", profileUrl);
-      return profileUrl;
-    }
-  }
-
-  if (student.value && student.value.raw && student.value.raw.photo_url) {
-    const photoUrl = student.value.raw.photo_url;
-    if (
-      photoUrl &&
-      (photoUrl.startsWith("http://") || photoUrl.startsWith("https://"))
-    ) {
-      console.log("Using photo_url from API:", photoUrl);
-      return photoUrl;
-    }
-  }
-
-  console.log("Using placeholder profile image");
-  return getPlaceholderProfile();
 };
 
 onMounted(async () => {
@@ -594,15 +591,21 @@ watch(
   position: relative;
   cursor: pointer;
   transition: transform 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
+
 .profile-image-container:hover {
   transform: scale(1.05);
 }
+
 .profile-image-container:active {
   transform: scale(0.96);
 }
+
 .profile-image {
   width: 100%;
   height: 100%;
