@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
+  compatibilityDate: '2026-10-07',
+
   devtools: { enabled: true },
+
   css: [
     "~/assets/css/main.css",
     "@vuepic/vue-datepicker/dist/main.css"
@@ -22,7 +25,7 @@ export default defineNuxtConfig({
         },
         { charset: "utf-8" },
       ],
-      
+
       script: [
         {
           src: "https://telegram.org/js/telegram-web-app.js",
@@ -35,6 +38,4 @@ export default defineNuxtConfig({
     "/home/**": { ssr: false },
     "/**": { ssr: false },
   },
-
-  components: true,
 });
