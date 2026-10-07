@@ -376,6 +376,18 @@ onMounted(async () => {
 watch(courses, (newCourses) => {
   console.log('Courses updated:', newCourses.length)
 }, { immediate: true })
+
+// TEMP Phase-1 verification — remove after checking
+if (process.client) {
+  window.__testMemberProfile = async () => {
+    const p = useMemberProfile()
+    await p.loadProfile()
+    console.table(p.profile.value)
+    await p.loadOptions()
+    console.log('OPTION KEYS:', Object.keys(p.options.value || {}))
+    return p
+  }
+}
 </script>
 
 <style scoped>
