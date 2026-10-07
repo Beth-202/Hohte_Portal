@@ -37,6 +37,8 @@
         <div
           class="profile-image-container"
           @click="goToProfile"
+          @keydown.enter="goToProfile"
+          @keydown.space.prevent="goToProfile"
           role="button"
           tabindex="0"
           aria-label="Open profile"
@@ -306,7 +308,7 @@ import classImage from "~/assets/images/class_image.png";
 
 const router = useRouter();
 const { t, setLocale, locale } = useLanguage();
-const { goToPermissionStatus, goToCourseDetail, goToProfile } = useNavigation()
+const { goToPermissionStatus, goToCourseDetail, goToProfile } = useNavigation();
 const {
   student,
   courses,
@@ -525,7 +527,7 @@ watch(
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
-  z-index: 2;
+  z-index: 3;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
 }
@@ -554,10 +556,12 @@ watch(
   top: 50%;
   transform: translateY(-50%);
   text-align: left;
-  width: 100%;
+  right: 90px;
   padding-left: 120px;
   box-sizing: border-box;
   z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .welcome-label {
@@ -573,6 +577,9 @@ watch(
   color: #ffc125;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-image-container {
@@ -583,9 +590,12 @@ watch(
   border: 3px solid #ffc125;
   box-shadow: 0 4px 15px rgba(255, 193, 37, 0.3);
   flex-shrink: 0;
-  z-index: 2;
+  z-index: 3;
+  position: relative;
   cursor: pointer;
   transition: transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .profile-image-container:hover {
   transform: scale(1.05);
@@ -598,6 +608,9 @@ watch(
   height: 100%;
   object-fit: cover;
   background: #2b4b8f;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* ========== ALERT BOX ========== */
@@ -668,7 +681,6 @@ watch(
   margin-bottom: 4px;
 }
 
-/* Glow effect */
 .evaluation-card::before {
   content: "";
   position: absolute;
@@ -760,7 +772,6 @@ watch(
   opacity: 1;
   transform: translateX(3px);
 }
-/* ========== END QUICK ACTION SECTION ========== */
 
 .section-title {
   font-size: 24px;
