@@ -62,7 +62,6 @@ const toggle = () => {
   expanded.value = !expanded.value
 }
 
-// Auto-collapse when a save finishes successfully (dirty goes false).
 watch(
   () => props.dirty,
   (isDirty, wasDirty) => {
@@ -72,7 +71,6 @@ watch(
   }
 )
 
-// Expose a way for the parent to programmatically expand (used by Imported banner "Edit").
 defineExpose({
   expand: () => { expanded.value = true },
   collapse: () => { expanded.value = false },
