@@ -722,11 +722,23 @@ const hydrate = () => {
   const p = profile.value || {};
 
   const personal = p.personal || {};
+  const pending = Array.isArray(p.pending_changes) ? p.pending_changes : [];
+  const pendingValueFor = (field) =>
+    pending.find((pc) => pc.field === field)?.new_value ?? null;
+
+  // Review-gated fields: if a pending change exists for a field, seed the
+  // form with the pending `new_value` (what the member is asking for), not
+  // the current applied value. Otherwise, saving another Personal field
+  // would re-send the current applied value, which the API reads as
+  // "cancel my pending change on that field."
+  //
+  // If the member types the current applied value back, that is treated by
+  // the API as a deliberate cancel — which is the intended behavior.
   Object.assign(form.personal, {
-    first_name: personal.first_name || "",
-    middle_name: personal.middle_name || "",
-    last_name: personal.last_name || "",
-    phone_number: personal.phone_number || "",
+    first_name: pendingValueFor("first_name") ?? personal.first_name ?? "",
+    middle_name: pendingValueFor("middle_name") ?? personal.middle_name ?? "",
+    last_name: pendingValueFor("last_name") ?? personal.last_name ?? "",
+    phone_number: pendingValueFor("phone_number") ?? personal.phone_number ?? "",
     baptismal_name: personal.baptismal_name || "",
     mother_name: personal.mother_name || "",
     birth_date: personal.birth_date || "",
