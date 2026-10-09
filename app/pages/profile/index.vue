@@ -870,6 +870,20 @@ onMounted(bootstrap)
 watch(profile, () => {
   if (profile.value) hydrate()
 })
+
+if (process.client) {
+  window.__testClassChange = async () => {
+    const cc = useClassChange()
+    await cc.loadAll()
+    console.log('OPTIONS:', cc.options.value)
+    console.log('REQUESTS:', cc.requests.value)
+    console.log('min/max:', cc.minChoices.value, cc.maxChoices.value)
+    console.log('current depts:', cc.currentDepartments.value)
+    console.log('available count:', cc.availableDepartments.value.length)
+    console.log('has_open_request:', cc.hasOpenRequest.value)
+    return cc
+  }
+}
 </script>
 
 <style scoped>
