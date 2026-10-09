@@ -25,6 +25,8 @@ export const useNavigation = () => {
       activeNav.value = "evaluations";
     } else if (path === "/profile" || path.startsWith("/profile/")) {
       activeNav.value = "profile";
+    } else if (path === "/class-change" || path.startsWith("/class-change/")) {
+      activeNav.value = "class-change";
     } else if (path === "/messages") {
       activeNav.value = "messages";
     } else if (path === "/alerts") {
@@ -64,6 +66,7 @@ export const useNavigation = () => {
   const goToPermissionRequest = () => navigateTo("/permission/request");
   const goToPermissionStatus = () => navigateTo("/permission/status");
   const goToProfile = () => navigateTo("/profile");
+  const goToClassChange = () => navigateTo("/class-change");
   const goToMessages = () => navigateTo("/messages");
   const goToAlerts = () => navigateTo("/alerts");
 
@@ -86,6 +89,7 @@ export const useNavigation = () => {
     goToPermissionRequest,
     goToPermissionStatus,
     goToProfile,
+    goToClassChange,
     goToMessages,
     goToAlerts,
     goToEvaluations,

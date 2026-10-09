@@ -578,6 +578,14 @@
         </div>
         <p v-else class="dept-empty">{{ t("profile.notSet") }}</p>
         <p class="dept-hint">{{ t("profile.departmentsReadOnly") }}</p>
+
+        <button
+          type="button"
+          class="btn-class-change"
+          @click="goToClassChange"
+        >
+          {{ t("profile.requestDeptChange") }}
+        </button>
       </div>
 
       <!-- Change requests -->
@@ -601,7 +609,7 @@ import ImportedBanner from "~/components/profile/ImportedBanner.vue";
 import ChangeRequestsList from "~/components/profile/ChangeRequestsList.vue";
 
 const { t } = useLanguage();
-const { goBack } = useNavigation();
+const { goBack, goToClassChange } = useNavigation();
 const { toasts, success, error: toastError, removeToast } = useToast();
 
 const {
@@ -1068,20 +1076,6 @@ onMounted(bootstrap);
 watch(profile, () => {
   if (profile.value) hydrate();
 });
-
-if (process.client) {
-  window.__testClassChange = async () => {
-    const cc = useClassChange();
-    await cc.loadAll();
-    console.log("OPTIONS:", cc.options.value);
-    console.log("REQUESTS:", cc.requests.value);
-    console.log("min/max:", cc.minChoices.value, cc.maxChoices.value);
-    console.log("current depts:", cc.currentDepartments.value);
-    console.log("available count:", cc.availableDepartments.value.length);
-    console.log("has_open_request:", cc.hasOpenRequest.value);
-    return cc;
-  };
-}
 </script>
 
 <style scoped>
@@ -1326,6 +1320,20 @@ if (process.client) {
   font-size: 12px;
   margin: 10px 0 0;
   font-style: italic;
+}
+
+.btn-class-change {
+  margin-top: 14px;
+  width: 100%;
+  background: #ffc125;
+  color: #1e3971;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .spinner {
