@@ -789,15 +789,19 @@ const skillsPayload = () => ({
   service_note: nullIfEmpty(form.skills.service_note),
 })
 
-// ------------------------------------------------------------------
-// Save handlers
-// ------------------------------------------------------------------
 const runSave = async (section, payload, successKey = 'profile.savedSuccess') => {
   savingSection.value = section
   sectionError[section] = ''
   try {
     await saveSection(section, payload)
-    hydrate() // refresh snapshot from server response
+    hydrate()
+
+    // If the payload touched review-gated fields, refresh the change requests
+    // so the "My change requests" list at the bottom updates immediately.
+    // Cheap call, and it also catches the case where the API just cancelled
+    // a previous pending on the same field.
+    await loadChangeRequests().catch(() => {})
+
     success(t(successKey))
   } catch (err) {
     if (err.status === 422 && err.errors) {
@@ -811,7 +815,6 @@ const runSave = async (section, payload, successKey = 'profile.savedSuccess') =>
     savingSection.value = ''
   }
 }
-
 const savePersonal = () => runSave('personal', personalPayload(), 'profile.savedPending')
 const saveAddress = () => runSave('address', addressPayload())
 const saveEducation = () => runSave('education', educationPayload())
