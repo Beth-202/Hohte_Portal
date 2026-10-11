@@ -285,6 +285,9 @@
               :placeholder="t('profile.chooseOption')"
               :allow-other="false"
               :error="fieldError('address.country')"
+              :searchable="true"
+              :search-placeholder="t('profile.searchOptions')"
+              :no-results-label="t('profile.noOptionsFound')"
             />
           </div>
 
@@ -298,6 +301,9 @@
                 :placeholder="t('profile.chooseOption')"
                 :other-label="t('profile.addOther')"
                 :other-placeholder="t('profile.address.cityOther')"
+                :searchable="true"
+                :search-placeholder="t('profile.searchOptions')"
+                :no-results-label="t('profile.noOptionsFound')"
               />
             </div>
 
@@ -428,6 +434,9 @@
               :placeholder="t('profile.chooseOption')"
               :other-label="t('profile.addOther')"
               :other-placeholder="t('profile.education.fieldOther')"
+              :searchable="true"
+              :search-placeholder="t('profile.searchOptions')"
+              :no-results-label="t('profile.noOptionsFound')"
             />
           </div>
           <div class="field">
