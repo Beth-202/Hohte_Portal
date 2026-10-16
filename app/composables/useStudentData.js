@@ -183,7 +183,12 @@ export const useStudentData = () => {
         submittedDate: formatDate(request.created_at),
         classDate:
           request.start_date || request.end_date
-            ? `${request.start_date} to ${request.end_date}`
+            ? `${request.start_date} to ${request.end_date}` +
+              (request.days_of_week?.length
+                ? ` (${request.days_of_week
+                    .map((day) => safeT(`requestStatus.weekdays.${day}`, day))
+                    .join(", ")})`
+                : "")
             : "Date not specified",
         reason: request.reason || request.category || "No reason provided",
         approvedBy: null,
@@ -490,6 +495,11 @@ export const useStudentData = () => {
         end_date: requestData.endDate || requestData.specificDate,
         reason: requestData.reason, // Custom reason text from textarea
       };
+
+      // Only sent when the member limited the range to some class days
+      if (requestData.daysOfWeek?.length) {
+        apiData.days_of_week = requestData.daysOfWeek;
+      }
 
       // Only add permission_reason_id if it exists and is not null
       if (requestData.reasonId) {
