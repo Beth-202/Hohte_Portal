@@ -91,7 +91,8 @@
       "selectStartDateFirst": "Please select a start date first",
       "rangeExceedsSixMonths": "End date cannot be more than 6 months after start date (max: {maxDate})",
       "notScheduledDay": "This date does not have a scheduled class",
-      "noScheduledDaysInRange": "No scheduled class days in this range"
+      "noScheduledDaysInRange": "No scheduled class days in this range",
+      "selectAtLeastOneDay": "Select at least one day"
     },
     "dateLimitHint": "You can only select dates within 6 months from today (max: {maxDate})",
     "tooltips": {
@@ -110,6 +111,17 @@
     "affectedSessions": "Affected class sessions",
     "totalSessions": "Total sessions",
     "noScheduledDays": "No scheduled class days in this range",
+    "onlyOnDays": "Only on these days",
+    "onlyOnDaysHint": "Untick the days you can still attend.",
+    "weekdays": {
+      "Monday": "Monday",
+      "Tuesday": "Tuesday",
+      "Wednesday": "Wednesday",
+      "Thursday": "Thursday",
+      "Friday": "Friday",
+      "Saturday": "Saturday",
+      "Sunday": "Sunday"
+    },
     "samples": {
       "mezmu": "MezmuT That",
       "kedamay": "Kedamay Course",

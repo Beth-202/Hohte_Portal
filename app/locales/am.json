@@ -91,7 +91,8 @@
       "selectStartDateFirst": "እባክዎ በመጀመሪያ የመጀመሪያ ቀን ይምረጡ",
       "rangeExceedsSixMonths": "የመጨረሻ ቀን ከመጀመሪያ ቀን በላይ 6 ወራት መሆን አይችልም (ከፍተኛ: {maxDate})",
       "notScheduledDay": "ይህ ቀን ቀጠሮ ያለው ክፍል የለውም",
-      "noScheduledDaysInRange": "በዚህ ጊዜ ውስጥ ምንም የቀጠሮ ቀናት የሉም"
+      "noScheduledDaysInRange": "በዚህ ጊዜ ውስጥ ምንም የቀጠሮ ቀናት የሉም",
+      "selectAtLeastOneDay": "ቢያንስ አንድ ቀን ይምረጡ"
     },
     "dateLimitHint": "ከዛሬ ጀምሮ ባሉት 6 ወራት ውስጥ ብቻ ቀን መምረጥ ይችላሉ (ከፍተኛ: {maxDate})",
     "tooltips": {
@@ -110,6 +111,17 @@
     "affectedSessions": "የሚነኩ የክፍል ክፍለ ጊዜዎች",
     "totalSessions": "ጠቅላላ ክፍለ ጊዜዎች",
     "noScheduledDays": "በዚህ ጊዜ ውስጥ ምንም የቀጠሮ ቀናት የሉም",
+    "onlyOnDays": "በእነዚህ ቀናት ብቻ",
+    "onlyOnDaysHint": "አሁንም መገኘት የሚችሉባቸውን ቀናት ምልክት ያንሱ።",
+    "weekdays": {
+      "Monday": "ሰኞ",
+      "Tuesday": "ማክሰኞ",
+      "Wednesday": "ረቡዕ",
+      "Thursday": "ሐሙስ",
+      "Friday": "ዓርብ",
+      "Saturday": "ቅዳሜ",
+      "Sunday": "እሁድ"
+    },
     "samples": {
       "mezmu": "መዝሙር ጥብቅ",
       "kedamay": "ከዳማይ ኮርስ",

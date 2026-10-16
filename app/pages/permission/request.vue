@@ -266,6 +266,25 @@
               </div>
             </div>
 
+            <!-- Weekdays: lets a member skip only some class days, e.g. Saturdays for 3 months -->
+            <div v-if="uniqueScheduleDays.length > 1" class="weekday-picker">
+              <div class="range-summary-label">{{ t('requestStatus.onlyOnDays') }}</div>
+              <p class="weekday-hint">{{ t('requestStatus.onlyOnDaysHint') }}</p>
+              <div class="weekday-options">
+                <button
+                  v-for="day in uniqueScheduleDays"
+                  :key="day"
+                  type="button"
+                  class="weekday-option"
+                  :class="{ active: selectedDays.includes(day) }"
+                  @click="toggleDay(day)"
+                >
+                  {{ t(`requestStatus.weekdays.${day}`) }}
+                </button>
+              </div>
+              <span v-if="errors.days" class="error-message">{{ errors.days }}</span>
+            </div>
+
             <!-- Range Summary -->
             <div v-if="formData.startDate && formData.endDate" class="range-summary">
               <div class="range-summary-label">{{ t('requestStatus.affectedSessions') }}:</div>
@@ -329,6 +348,7 @@ const { toasts, success, error: showError, removeToast } = useToast()
 const durationType = ref('specific')
 const isSubmitting = ref(false)
 const scheduleDays = ref([])
+const selectedDays = ref([])
 const showSpecificCalendar = ref(false)
 const showStartCalendar = ref(false)
 const showEndCalendar = ref(false)
@@ -356,7 +376,8 @@ const errors = ref({
   reason: '',
   specificDate: '',
   startDate: '',
-  endDate: ''
+  endDate: '',
+  days: ''
 })
 
 // Calendar state
@@ -427,6 +448,22 @@ const isScheduledDate = (date) => {
   if (!scheduleDays.value || scheduleDays.value.length === 0) return false
   const dayName = getDayName(date.getDay())
   return scheduleDays.value.includes(dayName)
+}
+
+// Class days in week order, each once (a class can have two schedules on the same day)
+const weekOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const uniqueScheduleDays = computed(() => weekOrder.filter(day => scheduleDays.value.includes(day)))
+
+// Every class day is selected until the member unticks one
+watch(uniqueScheduleDays, (days) => {
+  selectedDays.value = [...days]
+})
+
+const toggleDay = (day) => {
+  selectedDays.value = selectedDays.value.includes(day)
+    ? selectedDays.value.filter(d => d !== day)
+    : weekOrder.filter(d => d === day || selectedDays.value.includes(d))
+  clearError('days')
 }
 
 // Get calendar days
@@ -677,7 +714,7 @@ const getScheduledDatesInRange = computed(() => {
   let currentDate = new Date(start)
   
   while (currentDate <= end) {
-    if (isScheduledDate(currentDate)) {
+    if (isScheduledDate(currentDate) && selectedDays.value.includes(getDayName(currentDate.getDay()))) {
       dates.push(format(currentDate, 'yyyy-MM-dd'))
     }
     currentDate.setDate(currentDate.getDate() + 1)
@@ -850,7 +887,10 @@ const validateForm = () => {
       isValid = false
     }
     
-    if (formData.value.startDate && formData.value.endDate && getScheduledDatesInRange.value.length === 0) {
+    if (selectedDays.value.length === 0) {
+      errors.value.days = t('requestStatus.errors.selectAtLeastOneDay')
+      isValid = false
+    } else if (formData.value.startDate && formData.value.endDate && getScheduledDatesInRange.value.length === 0) {
       errors.value.startDate = t('requestStatus.errors.noScheduledDaysInRange')
       isValid = false
     }
@@ -885,6 +925,10 @@ const submitForm = async () => {
     durationType: durationType.value,
     startDate: startDate,
     endDate: endDate,
+    // Only sent when some class days were unticked; otherwise the permission covers every class day
+    daysOfWeek: durationType.value === 'range' && selectedDays.value.length < uniqueScheduleDays.value.length
+      ? [...selectedDays.value]
+      : null,
     reasonId: null
   }
 
@@ -1503,6 +1547,44 @@ onMounted(async () => {
   font-size: 14px;
   margin-top: 6px;
   font-weight: 500;
+}
+
+/* Weekday Picker Styles */
+.weekday-picker {
+  margin-top: 15px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.weekday-hint {
+  color: #b1afaf;
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.weekday-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.weekday-option {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.weekday-option.active {
+  background: #FFC125;
+  border-color: #FFC125;
+  color: #1e3971;
+  font-weight: 600;
 }
 
 /* Range Summary Styles */
