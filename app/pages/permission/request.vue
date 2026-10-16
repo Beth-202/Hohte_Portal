@@ -164,7 +164,7 @@
           <!-- Date Range -->
           <div v-else class="date-range-input">
             <p class="date-hint">{{ t('requestStatus.dateRangeHint') }}</p>
-            <div class="range-hint-text">{{ t('requestStatus.rangeLimitHint') }}</div>
+            <div class="range-hint-text">{{ t('requestStatus.rangeLimitHint', { days: requestLimits.maxDurationDays }) }}</div>
             
             <div class="range-calendars">
               <div class="range-field">
@@ -409,26 +409,49 @@ const formatDateForDisplay = (dateString) => {
 
 const minDate = ref(getTodayLocal())
 
-// Add 6 calendar months
-const addSixMonths = (dateString) => {
+// Add whole days to a YYYY-MM-DD date
+const addDays = (dateString, days) => {
   if (!dateString) return null
   const date = new Date(dateString)
-  date.setMonth(date.getMonth() + 6)
+  date.setDate(date.getDate() + days)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
 
+// Request limits come from the server (Permission Approval Settings), which
+// also enforces them. 180 days is the server default, used until they load.
+const DEFAULT_LIMIT_DAYS = 180
+const requestLimits = ref({ maxStartDate: null, maxDurationDays: DEFAULT_LIMIT_DAYS })
+
+const loadRequestLimits = async (classId) => {
+  try {
+    const query = classId ? `?class_id=${classId}` : ''
+    const response = await apiService.request(`/api/v1/student/permission-requests/limits${query}`)
+
+    if (response && response.max_start_date) {
+      minDate.value = response.min_start_date || minDate.value
+      requestLimits.value = {
+        maxStartDate: response.max_start_date,
+        maxDurationDays: response.max_duration_days || DEFAULT_LIMIT_DAYS
+      }
+    }
+  } catch (err) {
+    console.error('Could not load permission request limits:', err)
+  }
+}
+
 const maxStartDate = computed(() => {
-  return addSixMonths(minDate.value)
+  return requestLimits.value.maxStartDate || addDays(minDate.value, DEFAULT_LIMIT_DAYS)
 })
 
 const maxEndDate = computed(() => {
+  const lastDayOffset = requestLimits.value.maxDurationDays - 1
   if (durationType.value === 'range' && formData.value.startDate) {
-    return addSixMonths(formData.value.startDate)
+    return addDays(formData.value.startDate, lastDayOffset)
   }
-  return addSixMonths(minDate.value)
+  return addDays(maxStartDate.value, lastDayOffset)
 })
 
 // Format schedule days
@@ -725,6 +748,8 @@ const getScheduledDatesInRange = computed(() => {
 
 // Load schedule for selected class
 const loadClassSchedule = async (classId) => {
+  loadRequestLimits(classId)
+
   try {
     if (!classId) {
       scheduleDays.value = []
@@ -826,7 +851,7 @@ const validateEndDate = () => {
   }
   
   if (maxEndDate.value && formData.value.endDate > maxEndDate.value) {
-    errors.value.endDate = t('requestStatus.errors.rangeExceedsSixMonths', { maxDate: formatDateForDisplay(maxEndDate.value) })
+    errors.value.endDate = t('requestStatus.errors.rangeExceedsSixMonths', { days: requestLimits.value.maxDurationDays, maxDate: formatDateForDisplay(maxEndDate.value) })
     return false
   }
   
