@@ -49,6 +49,8 @@
     "descriptionText3": "different cultural and religious contexts."
   },
   "requestStatus": {
+    "clear": "Clear",
+    "close": "Close",
     "title": "Request Status",
     "tabs": {
       "all": "All",

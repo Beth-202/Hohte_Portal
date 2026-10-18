@@ -151,7 +151,8 @@
                     </div>
                   </div>
                   <div class="calendar-footer">
-                    <button class="clear-calendar-btn" @click="clearSpecificDate">Clear</button>
+                    <button class="clear-calendar-btn" @click="clearSpecificDate">{{ t('requestStatus.clear') }}</button>
+                        <button class="close-calendar-btn" @click="closeDropdowns">{{ t('requestStatus.close') }}</button>
                   </div>
                 </div>
               </div>
@@ -208,7 +209,8 @@
                         </div>
                       </div>
                       <div class="calendar-footer">
-                        <button class="clear-calendar-btn" @click="clearStartDate">Clear</button>
+                        <button class="clear-calendar-btn" @click="clearStartDate">{{ t('requestStatus.clear') }}</button>
+                        <button class="close-calendar-btn" @click="closeDropdowns">{{ t('requestStatus.close') }}</button>
                       </div>
                     </div>
                   </div>
@@ -257,7 +259,8 @@
                         </div>
                       </div>
                       <div class="calendar-footer">
-                        <button class="clear-calendar-btn" @click="clearEndDate">Clear</button>
+                        <button class="clear-calendar-btn" @click="clearEndDate">{{ t('requestStatus.clear') }}</button>
+                        <button class="close-calendar-btn" @click="closeDropdowns">{{ t('requestStatus.close') }}</button>
                       </div>
                     </div>
                   </div>
@@ -555,44 +558,27 @@ const getCalendarDays = (monthDate) => {
 }
 
 // Get range calendar days
-const getRangeCalendarDays = (monthDate, selectedDate) => {
-  const start = startOfWeek(startOfMonth(monthDate), { weekStartsOn: 0 })
-  const end = endOfWeek(endOfMonth(monthDate), { weekStartsOn: 0 })
-  
-  return eachDayOfInterval({ start, end }).map(date => {
+const getRangeCalendarDays = (monthDate, which) => {
+  const calendarStart = startOfWeek(startOfMonth(monthDate), { weekStartsOn: 0 })
+  const calendarEnd = endOfWeek(endOfMonth(monthDate), { weekStartsOn: 0 })
+  const selectedDate = which === 'start' ? formData.value.startDate : formData.value.endDate
+
+  // Start: today .. max days ahead. End: the start date .. start + max duration.
+  const firstAllowed = which === 'end' && formData.value.startDate ? formData.value.startDate : minDate.value
+  const lastAllowed = which === 'end' ? maxEndDate.value : maxStartDate.value
+
+  return eachDayOfInterval({ start: calendarStart, end: calendarEnd }).map(date => {
     const dateStr = format(date, 'yyyy-MM-dd')
-    const isPast = isBefore(date, new Date()) && !isToday(date)
-    const isScheduled = isScheduledDate(date)
-    const isSelected = dateStr === selectedDate
-    
-    let isDisabled = isPast
-    
-    if (selectedDate === formData.value.startDate) {
-      if (isBefore(date, new Date(minDate.value)) || isAfter(date, new Date(maxStartDate.value))) {
-        isDisabled = true
-      }
-    }
-    
-    if (selectedDate === formData.value.endDate) {
-      if (formData.value.startDate) {
-        if (isBefore(date, new Date(formData.value.startDate)) || isAfter(date, new Date(maxEndDate.value))) {
-          isDisabled = true
-        }
-      } else {
-        if (isBefore(date, new Date(minDate.value)) || isAfter(date, new Date(maxStartDate.value))) {
-          isDisabled = true
-        }
-      }
-    }
-    
+    const isPast = dateStr < minDate.value
+
     return {
       date: dateStr,
       day: getDate(date),
       isOtherMonth: !isSameMonth(date, monthDate),
-      isScheduled: isScheduled,
-      isSelected: isSelected,
+      isScheduled: isScheduledDate(date),
+      isSelected: dateStr === selectedDate,
       isPast: isPast,
-      isDisabled: isDisabled,
+      isDisabled: isPast || dateStr < firstAllowed || (lastAllowed && dateStr > lastAllowed),
       fullDate: date
     }
   })
@@ -629,11 +615,11 @@ const endYear = computed(() => {
 })
 
 const startCalendarDays = computed(() => {
-  return getRangeCalendarDays(startMonth.value, formData.value.startDate)
+  return getRangeCalendarDays(startMonth.value, 'start')
 })
 
 const endCalendarDays = computed(() => {
-  return getRangeCalendarDays(endMonth.value, formData.value.endDate)
+  return getRangeCalendarDays(endMonth.value, 'end')
 })
 
 // Toggle calendars - using absolute positioning
@@ -646,6 +632,7 @@ const toggleSpecificCalendar = (event) => {
   const rect = event.currentTarget.getBoundingClientRect()
   const parentRect = event.currentTarget.closest('.date-picker-wrapper').getBoundingClientRect()
   
+  closeDropdowns()
   dropdownStyle.value = {
     position: 'absolute',
     top: '100%',
@@ -663,14 +650,8 @@ const toggleStartCalendar = (event) => {
     return
   }
   
-  dropdownStyle.value = {
-    position: 'absolute',
-    top: '100%',
-    left: '0',
-    width: '100%',
-    zIndex: 9999,
-    marginTop: '4px'
-  }
+  closeDropdowns()
+  startMonth.value = formData.value.startDate ? new Date(formData.value.startDate) : new Date()
   showStartCalendar.value = true
 }
 
@@ -680,14 +661,8 @@ const toggleEndCalendar = (event) => {
     return
   }
   
-  dropdownStyle.value = {
-    position: 'absolute',
-    top: '100%',
-    left: '0',
-    width: '100%',
-    zIndex: 9999,
-    marginTop: '4px'
-  }
+  closeDropdowns()
+  endMonth.value = new Date(formData.value.endDate || formData.value.startDate || minDate.value)
   showEndCalendar.value = true
 }
 
@@ -754,6 +729,8 @@ const selectStartDate = (day) => {
   formData.value.startDate = day.date
   showStartCalendar.value = false
   validateStartDate()
+  endMonth.value = new Date(day.date)
+  showEndCalendar.value = true
 }
 
 const selectEndDate = (day) => {
@@ -1562,7 +1539,20 @@ onMounted(async () => {
   padding-top: 8px;
   margin-top: 8px;
   border-top: 1px solid #eee;
-  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-calendar-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #FFC125;
+  color: #1e3971;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .clear-calendar-btn {
