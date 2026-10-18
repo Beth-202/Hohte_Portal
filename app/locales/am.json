@@ -49,6 +49,8 @@
     "descriptionText3": "ባህላዊና ሃይማኖታዊ አውዶች ላይ ያላቸውን ተፅዕኖ"
   },
   "requestStatus": {
+    "clear": "አጥፋ",
+    "close": "ዝጋ",
     "title": "የጥያቄ ሁኔታ",
     "tabs": {
       "all": "ሁሉም",
