@@ -103,7 +103,7 @@ defineExpose({ reload })
             :disabled="slot.seats_left === 0"
             @click="chooseSession(slot)"
           >
-            {{ slot.start_time }} - {{ slot.end_time }}
+            {{ slot.time_label || `${slot.start_time} - ${slot.end_time}` }}
             <small>{{ slot.seats_left === 0 ? t('booking.full') : t('booking.seatsLeft', { count: slot.seats_left }) }}</small>
           </button>
         </div>
