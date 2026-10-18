@@ -224,6 +224,20 @@ export class ApiService {
     });
   }
 
+  // Office sessions a member can book to explain a long-term request
+  async getBookingSlots(classId) {
+    const query = classId ? `?class_id=${classId}` : "";
+    return this.request(`/api/v1/student/booking-slots${query}`);
+  }
+
+  // Book or move the office visit of a pending request: { date, session_id }
+  async updatePermissionBooking(id, booking) {
+    return this.request(`/api/v1/student/permission-requests/${id}/booking`, {
+      method: "PUT",
+      body: JSON.stringify(booking),
+    });
+  }
+
   async cancelPermissionRequest(id) {
     return this.request(`/api/v1/student/permission-requests/${id}`, {
       method: "DELETE",

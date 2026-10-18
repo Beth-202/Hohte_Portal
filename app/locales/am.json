@@ -390,5 +390,30 @@
   "reasonUnchanged": "ምክንያቱ አልተቀየረም።",
   "alreadyHasPending": "አስቀድመው በመጠባበቅ ላይ ያለ ጥያቄ አለዎት።",
   "rank": "ደረጃ"
-}
+},
+  "booking": {
+    "title": "የቢሮ ቀጠሮ",
+    "explain": "ከ{days} ቀን በላይ ለሆነ ፈቃድ ቢሮ መጥተው ጥያቄዎን ማስረዳት አለብዎት። የሚመችዎትን ቀንና ሰዓት ይምረጡ።",
+    "chooseDay": "ቀን ይምረጡ",
+    "chooseTime": "ሰዓት ይምረጡ",
+    "seatsLeft": "{count} ቦታ ቀርቷል",
+    "full": "ሞልቷል",
+    "loading": "ክፍት ሰዓቶች በመጫን ላይ...",
+    "loadFailed": "ክፍት ሰዓቶችን መጫን አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "noSlots": "በአሁኑ ጊዜ ክፍት የቢሮ ሰዓት የለም። እባክዎ ቆይተው ይሞክሩ።",
+    "required": "እባክዎ ቢሮ የሚመጡበትን ቀንና ሰዓት ይምረጡ።",
+    "visit": "የቢሮ ቀጠሮ",
+    "reschedule": "ቀጠሮ ቀይር",
+    "rescheduleTitle": "የቢሮ ቀጠሮ ይቀይሩ",
+    "current": "የአሁኑ ቀጠሮ",
+    "confirmReschedule": "ቀይር",
+    "saving": "በማስቀመጥ ላይ...",
+    "rescheduled": "ቀጠሮዎ ተቀይሯል።",
+    "rescheduleFailed": "ቀጠሮውን መቀየር አልተቻለም።",
+    "status": {
+      "booked": "ተይዟል",
+      "attended": "ተገኝተዋል",
+      "no_show": "አልተገኙም"
+    }
+  }
 }
