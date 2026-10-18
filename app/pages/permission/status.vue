@@ -182,7 +182,7 @@ const newBooking = ref(null);
 const isRescheduling = ref(false);
 
 const bookingText = (booking) =>
-  `${t(`requestStatus.weekdays.${booking.weekday}`)} ${booking.date_ec}, ${booking.start_time} - ${booking.end_time}`;
+  `${t(`requestStatus.weekdays.${booking.weekday}`)} ${booking.date_ec}, ${booking.time_label || `${booking.start_time} - ${booking.end_time}`}`;
 
 const openReschedule = (request) => {
   requestToReschedule.value = request;
