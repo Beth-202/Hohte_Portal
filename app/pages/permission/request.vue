@@ -309,6 +309,17 @@
         </div>
       </div>
 
+      <!-- Long-term requests: book a time to explain the request at the office -->
+      <div v-if="needsBooking" class="booking-section">
+        <div class="field-header">
+          <span class="field-label">{{ t('booking.title') }}</span>
+          <span class="required-asterisk">*</span>
+        </div>
+        <p class="weekday-hint">{{ t('booking.explain', { days: requestLimits.longTermThresholdDays }) }}</p>
+        <OfficeSlotPicker ref="slotPickerRef" v-model="booking" :class-id="formData.course" @update:model-value="clearError('booking')" />
+        <span v-if="errors.booking" class="error-message">{{ errors.booking }}</span>
+      </div>
+
       <div class="submit-section">
         <button class="submit-btn" @click="submitForm" :disabled="isSubmitting">
           {{ isSubmitting ? t('requestStatus.submitting') : t('requestStatus.submit') }}
@@ -330,6 +341,7 @@ import { useToast } from '~/composables/useToast'
 import { useSchool } from '~/composables/useSchool'
 import { apiService } from '~/services/api.service'
 import ToastNotification from '~/components/ToastNotification.vue'
+import OfficeSlotPicker from '~/components/permission/OfficeSlotPicker.vue'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isBefore, isAfter, addMonths, subMonths, startOfWeek, endOfWeek, getDate, getMonth, getYear } from 'date-fns'
 
 const { locale, t, setLocale } = useLanguage()
@@ -377,8 +389,13 @@ const errors = ref({
   specificDate: '',
   startDate: '',
   endDate: '',
-  days: ''
+  days: '',
+  booking: ''
 })
+
+// The office visit booked for a long-term request: { date, session_id }
+const booking = ref(null)
+const slotPickerRef = ref(null)
 
 // Calendar state
 const currentMonth = ref(new Date())
@@ -423,7 +440,12 @@ const addDays = (dateString, days) => {
 // Request limits come from the server (Permission Approval Settings), which
 // also enforces them. 180 days is the server default, used until they load.
 const DEFAULT_LIMIT_DAYS = 180
-const requestLimits = ref({ maxStartDate: null, maxDurationDays: DEFAULT_LIMIT_DAYS })
+const requestLimits = ref({
+  maxStartDate: null,
+  maxDurationDays: DEFAULT_LIMIT_DAYS,
+  longTermThresholdDays: null,
+  bookingRequiredForLongTerm: false
+})
 
 const loadRequestLimits = async (classId) => {
   try {
@@ -434,13 +456,29 @@ const loadRequestLimits = async (classId) => {
       minDate.value = response.min_start_date || minDate.value
       requestLimits.value = {
         maxStartDate: response.max_start_date,
-        maxDurationDays: response.max_duration_days || DEFAULT_LIMIT_DAYS
+        maxDurationDays: response.max_duration_days || DEFAULT_LIMIT_DAYS,
+        longTermThresholdDays: response.long_term_threshold_days ?? null,
+        bookingRequiredForLongTerm: response.booking_required_for_long_term === true
       }
     }
   } catch (err) {
     console.error('Could not load permission request limits:', err)
   }
 }
+
+// A request spanning more days than the class's threshold is long-term; those
+// need an office visit once HR has set office sessions up.
+const requestSpanDays = computed(() => {
+  if (durationType.value !== 'range' || !formData.value.startDate || !formData.value.endDate) return 1
+  const start = new Date(formData.value.startDate)
+  const end = new Date(formData.value.endDate)
+  return Math.round((end - start) / 86400000) + 1
+})
+
+const needsBooking = computed(() => {
+  const threshold = requestLimits.value.longTermThresholdDays
+  return requestLimits.value.bookingRequiredForLongTerm && threshold !== null && requestSpanDays.value > threshold
+})
 
 const maxStartDate = computed(() => {
   return requestLimits.value.maxStartDate || addDays(minDate.value, DEFAULT_LIMIT_DAYS)
@@ -921,6 +959,11 @@ const validateForm = () => {
     }
   }
 
+  if (needsBooking.value && !booking.value) {
+    errors.value.booking = t('booking.required')
+    isValid = false
+  }
+
   return isValid
 }
 
@@ -954,6 +997,7 @@ const submitForm = async () => {
     daysOfWeek: durationType.value === 'range' && selectedDays.value.length < uniqueScheduleDays.value.length
       ? [...selectedDays.value]
       : null,
+    booking: needsBooking.value ? booking.value : null,
     reasonId: null
   }
 
@@ -970,6 +1014,12 @@ const submitForm = async () => {
         goBack()
       }, 1500)
     } else {
+      if (result.errors?.booking_date) {
+        // The session filled up or closed meanwhile: show fresh times
+        errors.value.booking = result.errors.booking_date[0]
+        booking.value = null
+        slotPickerRef.value?.reload()
+      }
       showError(result.error || t('requestStatus.submissionFailed'), 4000)
     }
   } catch (err) {
@@ -1572,6 +1622,15 @@ onMounted(async () => {
   font-size: 14px;
   margin-top: 6px;
   font-weight: 500;
+}
+
+/* Office Booking Styles */
+.booking-section {
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(255, 193, 37, 0.08);
+  border: 1px solid rgba(255, 193, 37, 0.4);
+  border-radius: 8px;
 }
 
 /* Weekday Picker Styles */

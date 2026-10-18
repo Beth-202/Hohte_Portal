@@ -394,5 +394,30 @@
   "reasonUnchanged": "Reason did not change.",
   "alreadyHasPending": "You already have a pending request.",
   "rank": "Rank"
-}
+},
+  "booking": {
+    "title": "Office visit",
+    "explain": "A permission longer than {days} days must be explained in person at the office. Choose a day and time that suits you.",
+    "chooseDay": "Choose a day",
+    "chooseTime": "Choose a time",
+    "seatsLeft": "{count} left",
+    "full": "Full",
+    "loading": "Loading open times...",
+    "loadFailed": "Could not load open times. Please try again.",
+    "noSlots": "There are no open office times right now. Please try again later.",
+    "required": "Please choose when you will come to the office.",
+    "visit": "Office visit",
+    "reschedule": "Reschedule",
+    "rescheduleTitle": "Move your office visit",
+    "current": "Current visit",
+    "confirmReschedule": "Move visit",
+    "saving": "Saving...",
+    "rescheduled": "Your office visit has been moved.",
+    "rescheduleFailed": "Could not move the office visit.",
+    "status": {
+      "booked": "Booked",
+      "attended": "Attended",
+      "no_show": "Missed"
+    }
+  }
 }

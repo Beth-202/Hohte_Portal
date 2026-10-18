@@ -6,6 +6,8 @@ import { useStudentData } from "~/composables/useStudentData";
 import { useToast } from '~/composables/useToast'
 import { useSchool } from '~/composables/useSchool'
 import ToastNotification from '~/components/ToastNotification.vue'
+import OfficeSlotPicker from '~/components/permission/OfficeSlotPicker.vue'
+import { apiService } from '~/services/api.service'
 
 const { locale, t, setLocale } = useLanguage();
 const { goBack, goToPermissionRequest } = useNavigation();
@@ -171,6 +173,35 @@ const confirmCancel = async () => {
       showCancelModal.value = false;
       requestToCancel = null;
     }
+  }
+};
+
+// Moving the office visit of a pending long-term request
+const requestToReschedule = ref(null);
+const newBooking = ref(null);
+const isRescheduling = ref(false);
+
+const bookingText = (booking) =>
+  `${t(`requestStatus.weekdays.${booking.weekday}`)} ${booking.date_ec}, ${booking.start_time} - ${booking.end_time}`;
+
+const openReschedule = (request) => {
+  requestToReschedule.value = request;
+  newBooking.value = null;
+};
+
+const confirmReschedule = async () => {
+  if (!requestToReschedule.value || !newBooking.value) return;
+  isRescheduling.value = true;
+  try {
+    await apiService.updatePermissionBooking(requestToReschedule.value.id, newBooking.value);
+    success(t('booking.rescheduled'), 3000);
+    requestToReschedule.value = null;
+    await refreshPermissionRequests();
+  } catch (err) {
+    console.error('Reschedule error:', err);
+    showError(err.errors?.date?.[0] || err.message || t('booking.rescheduleFailed'), 4000);
+  } finally {
+    isRescheduling.value = false;
   }
 };
 
@@ -361,6 +392,13 @@ onMounted(async () => {
               <span class="detail-label">{{ t('requestStatus.reason') }}:</span>
               <span class="detail-value">{{ request.reason }}</span>
             </div>
+            <div v-if="request.booking" class="detail-row">
+              <span class="detail-label">{{ t('booking.visit') }}:</span>
+              <span class="detail-value">
+                {{ bookingText(request.booking) }}
+                <span v-if="request.booking.status !== 'booked'" class="booking-status">({{ t(`booking.status.${request.booking.status}`) }})</span>
+              </span>
+            </div>
             <div
               v-if="request.status.toLowerCase() === 'approved' && request.approvedBy"
               class="detail-row"
@@ -390,6 +428,13 @@ onMounted(async () => {
               </div>
             </div>
             <div class="footer-right">
+              <button
+                v-if="request.booking?.can_reschedule"
+                class="reschedule-button"
+                @click="openReschedule(request)"
+              >
+                {{ t('booking.reschedule') }}
+              </button>
               <button
                 v-if="request.status.toLowerCase() === 'pending'"
                 class="cancel-button"
@@ -434,6 +479,26 @@ onMounted(async () => {
           </button>
           <button class="modal-confirm" @click="confirmCancel">
             {{ t('common.yes') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="requestToReschedule"
+      class="modal-overlay"
+      @click.self="requestToReschedule = null"
+    >
+      <div class="modal-content booking-modal">
+        <h3>{{ t('booking.rescheduleTitle') }}</h3>
+        <p>{{ t('booking.current') }}: {{ bookingText(requestToReschedule.booking) }}</p>
+        <OfficeSlotPicker v-model="newBooking" />
+        <div class="modal-actions">
+          <button class="modal-cancel" @click="requestToReschedule = null">
+            {{ t('common.no') }}
+          </button>
+          <button class="modal-reschedule" :disabled="!newBooking || isRescheduling" @click="confirmReschedule">
+            {{ isRescheduling ? t('booking.saving') : t('booking.confirmReschedule') }}
           </button>
         </div>
       </div>
@@ -1053,6 +1118,48 @@ onMounted(async () => {
 
 .modal-confirm:hover {
   background: #d32f2f;
+}
+
+.booking-modal {
+  background: #1e3971;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.booking-modal h3,
+.booking-modal p {
+  color: #ffffff;
+}
+
+.booking-modal .modal-actions {
+  margin-top: 16px;
+}
+
+.modal-reschedule {
+  background: #FFC125;
+  color: #1e3971;
+  font-weight: 600;
+}
+
+.modal-reschedule:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reschedule-button {
+  background: transparent;
+  border: 1px solid #FFC125;
+  color: #b8860b;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  margin-right: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.booking-status {
+  opacity: 0.75;
 }
 
 @media (max-width: 480px) {
